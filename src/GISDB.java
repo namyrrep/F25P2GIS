@@ -29,12 +29,16 @@ public class GISDB implements GIS {
      */
     public BSTree bstree;
 
+    private bTree;
+    private kTree;
+
     // ----------------------------------------------------------
     /**
-     * Create a new MovieRaterDB object.
+     * Create a new GISDB object.
      */
     GISDB() {
-        // Put your code here
+        btree = new BSTree<String>();
+        kTree = new kdTree();
     }
 
 
@@ -45,7 +49,9 @@ public class GISDB implements GIS {
      * @return True if the database has been cleared
      */
     public boolean clear() {
-        return false;
+        Btree = new BSTree<String>();
+        kTree = new kdTree();
+        return true;
     }
 
 
@@ -64,6 +70,13 @@ public class GISDB implements GIS {
      * @return True iff the city is successfully entered into the database
      */
     public boolean insert(String name, int x, int y) {
+        if (x >= 0 && x < MAXCOORD && y >= 0 && y < MAXCOORD) {
+            City newCity = new City(name, x, y);
+            if (kTree.insert(newCity)) {
+                bTree.insert(name, newCity);
+                return true;
+            }
+        }
         return false;
     }
 
