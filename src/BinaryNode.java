@@ -7,8 +7,8 @@
  */
 public class BinaryNode<T>{
 	private T data;
-	private BinaryNode left;
-	private BinaryNode right;
+	private BinaryNode<T> left;
+	private BinaryNode<T> right;
 	
 	/**
 	 * This is the parameterized BinaryNode constructor that takes a generic value T
@@ -16,6 +16,8 @@ public class BinaryNode<T>{
 	 */
 	public BinaryNode(T value) {
 		this.data = value;
+		this.left = null;
+		this.right = null;
 	}
 	
 	/**
@@ -35,28 +37,28 @@ public class BinaryNode<T>{
 	/**
 	 * This is the getter method for left field.
 	 */
-	public BinaryNode getLeft() {
+	public BinaryNode<T> getLeft() {
 		return left;
 	}
 	
 	/**
 	 * This is the setter method for left field.
 	 */
-	public void setLeft(BinaryNode newLeft) {
+	public void setLeft(BinaryNode<T> newLeft) {
 		left = newLeft;
 	}
 	
 	/**
 	 * This is the getter method for right field.
 	 */
-	public BinaryNode getRight() {
+	public BinaryNode<T> getRight() {
 		return right;
 	}
 	
 	/**
 	 * This is the setter method for right field.
 	 */
-	public void setRight(BinaryNode newRight) {
+	public void setRight(BinaryNode<T> newRight) {
 		right = newRight;
 	}
 }
