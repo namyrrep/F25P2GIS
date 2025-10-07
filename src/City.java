@@ -2,7 +2,7 @@
  * This is the City class that stores the cityRecords that we are using to sort
  * in trees.
  */
-public class City {
+public class City implements Comparable<City> {
     private String cityName;
     private int xValue;
     private int yValue;
@@ -14,6 +14,19 @@ public class City {
         this.cityName = name;
         this.xValue = x;
         this.yValue = y;
+    }
+
+
+    /**
+     * Help sorts by name.
+     * 
+     * @param other
+     *            which is the city being compared
+     * @return int depending how it is compared
+     * @Override
+     */
+    public int compareTo(City other) {
+        return this.cityName.compareTo(other.cityName);
     }
 
 

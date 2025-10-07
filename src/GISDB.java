@@ -18,24 +18,23 @@ public class GISDB implements GIS {
      * Dimension of the points stored in the tree
      */
     public static final int DIMENSION = 2;
-    
+
     /**
-     * This is the KD tree 
+     * This is the KD tree
      */
     private kdTree kTree;
-    
+
     /**
      * This is the Binary search tree
      */
-    private BSTree bTree;
-
+    private BSTree<City> bTree;
 
     // ----------------------------------------------------------
     /**
      * Create a new GISDB object.
      */
     public GISDB() {
-        bTree = new BSTree<BinaryNode<City>>(null);
+        bTree = new BSTree<City>(null);
         kTree = new kdTree(null);
     }
 
@@ -47,7 +46,7 @@ public class GISDB implements GIS {
      * @return True if the database has been cleared
      */
     public boolean clear() {
-        bTree = new BSTree<BinaryNode<City>>(null);
+        bTree = new BSTree<City>(null);
         kTree = new kdTree(null);
         return true;
     }
@@ -70,6 +69,7 @@ public class GISDB implements GIS {
     public boolean insert(String name, int x, int y) {
         if (x >= 0 && x < MAXCOORD && y >= 0 && y < MAXCOORD) {
             City newCity = new City(name, x, y);
+            // If kTree already has cords return false and escape,
             if (kTree.insert(newCity)) {
                 bTree.insert(newCity);
                 return true;
