@@ -100,24 +100,69 @@ public class kdTree {
      * 
      * @return String of the tree
      */
-    public String printKDTree(BinaryNode<City> node) {
-    	//Use root for the initial insert, which will be null.
-    	if (node == null) {
-    		node = root;
-    	}
-    	
+    public String printInOrder(BinaryNode<City> node) {    	
     	String str = "";
     	
-    	if (node.getLeft() != null) { //left branch
-    		str += printKDTree(node.getLeft());
+    	if (node == null) {
+    		return str;
     	}
     	
+    	//left branch
+    	str += printInOrder(node.getLeft());
+    	
+    	//current value
     	str += node.toString() + "\n"; //current value
     	
-    	if (node.getRight() != null) { //right branch
-    		str += printKDTree(node.getRight());
-    	}
+    	//right branch
+    	str += printInOrder(node.getRight());
 
     	return str;
     }
+    
+    /**
+     * Returns the tree printed out in pre-order format
+     * 
+     * @return String of the tree
+     */
+    private String printPreOrder(BinaryNode<City> node, int dimension, String spaces) {
+    	String str = "";
+    	
+    	if (node == null) {
+    		return str;
+    	}
+    	
+    	//current value
+    	str += dimension + spaces + node.toString() + "\n"; //current value
+    	    	
+    	//left branch
+    	str += printPreOrder(node.getLeft(), dimension++, spaces + "  ");
+    	
+    	//right branch
+    	str += printPreOrder(node.getRight(), dimension++, spaces + "  ");
+
+    	return str;
+    }
+    
+    /**
+     * Prints the pre-order helper method
+     * 
+     * @return
+     */
+    public String debug() {
+    	return printPreOrder(root, 0, "");
+    }
+    
+    /**
+     * Deletes the first instance of the parameterized coordinates.
+     * 
+     * @param x - The X coordinate for possible deletion
+     * @param y - The Y coordinate for possible deletion
+     * @return Name of the city deleted
+     */
+    public String deleteByCo(int x, int y) {
+    	
+    	
+    	return "";
+    }
+
 }
