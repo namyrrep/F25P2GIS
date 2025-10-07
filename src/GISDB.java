@@ -22,23 +22,21 @@ public class GISDB implements GIS {
     /**
      * This is the KD tree 
      */
-    public kdTree kdtree;
+    private kdTree kTree;
     
     /**
      * This is the Binary search tree
      */
-    public BSTree bstree;
+    private BSTree bTree;
 
-    private bTree;
-    private kTree;
 
     // ----------------------------------------------------------
     /**
      * Create a new GISDB object.
      */
-    GISDB() {
-        btree = new BSTree<String>();
-        kTree = new kdTree();
+    public GISDB() {
+        bTree = new BSTree<BinaryNode<City>>(null);
+        kTree = new kdTree(null);
     }
 
 
@@ -49,8 +47,8 @@ public class GISDB implements GIS {
      * @return True if the database has been cleared
      */
     public boolean clear() {
-        Btree = new BSTree<String>();
-        kTree = new kdTree();
+        bTree = new BSTree<BinaryNode<City>>(null);
+        kTree = new kdTree(null);
         return true;
     }
 
@@ -73,7 +71,7 @@ public class GISDB implements GIS {
         if (x >= 0 && x < MAXCOORD && y >= 0 && y < MAXCOORD) {
             City newCity = new City(name, x, y);
             if (kTree.insert(newCity)) {
-                bTree.insert(name, newCity);
+                bTree.insert(newCity);
                 return true;
             }
         }
