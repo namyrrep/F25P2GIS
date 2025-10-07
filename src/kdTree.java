@@ -140,16 +140,16 @@ public class kdTree {
         if (node == null) {
             return str;
         }
-
-        // current value
-        str += dimension + spaces + node.getData().toString() + "\n"; // current value
-
-        // left branch
-        str += printPreOrder(node.getLeft(), dimension++, spaces + "  ");
-
-        // right branch
-        str += printPreOrder(node.getRight(), dimension++, spaces + "  ");
-
+        
+        //left branch
+        str += printPreOrder(node.getLeft(), dimension + 1, spaces + "  ");
+        
+        //current value
+        str += dimension + spaces + node.getData().toString() + "\n";
+        
+        //right branch
+        str += printPreOrder(node.getRight(), dimension + 1, spaces + "  ");
+        
         return str;
     }
 
@@ -160,7 +160,7 @@ public class kdTree {
      * @return
      */
     public String debug() {
-        return printPreOrder(root, -1, "");
+        return printPreOrder(root, 0, "");
     }
 
 
