@@ -142,7 +142,7 @@ public class kdTree {
         }
 
         // current value
-        str += dimension + spaces + node.toString() + "\n"; // current value
+        str += dimension + spaces + node.getData().toString() + "\n"; // current value
 
         // left branch
         str += printPreOrder(node.getLeft(), dimension++, spaces + "  ");
@@ -160,7 +160,7 @@ public class kdTree {
      * @return
      */
     public String debug() {
-        return printPreOrder(root, 0, "");
+        return printPreOrder(root, -1, "");
     }
 
 
