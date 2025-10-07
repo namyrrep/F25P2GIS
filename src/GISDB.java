@@ -70,7 +70,7 @@ public class GISDB implements GIS {
         if (x >= 0 && x < MAXCOORD && y >= 0 && y < MAXCOORD) {
             City newCity = new City(name, x, y);
             // If kTree already has cords return false and escape,
-            if (kTree.insert(null, newCity, 0)) {
+            if (kTree.insert(newCity)) {
                 bTree.insert(newCity);
                 return true;
             }
