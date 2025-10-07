@@ -45,16 +45,11 @@ public class kdTree {
      * @param city
      * @return boolean if successfully inserted
      */
-    public boolean insert(BinaryNode<City> node, City city, int dimension) {
+    private boolean helpInsert(BinaryNode<City> node, City city, int dimension) {
         // If root is null, add city to the root.
         if (root == null) {
             this.setRoot(new BinaryNode<City>(city));
             return true;
-        }
-
-        // Use root for the initial insert, which will be null.
-        if (node == null) {
-            node = root;
         }
 
         // Check the dimension to see if we are checking the X or Y coordinate.
@@ -65,7 +60,7 @@ public class kdTree {
                     node.setLeft(new BinaryNode<City>(city));
                     return true;
                 }
-                return insert(node.getLeft(), city, dimension + 1);
+                return helpInsert(node.getLeft(), city, dimension + 1);
             }
             // Returns false if equal
             if (node.getData().getXValue() == city.getXValue() && node.getData()
@@ -77,7 +72,7 @@ public class kdTree {
                 node.setRight(new BinaryNode<City>(city));
                 return true;
             }
-            return insert(node.getRight(), city, dimension + 1);
+            return helpInsert(node.getRight(), city, dimension + 1);
         }
         // Go Left if y value is less than.
         if (city.getYValue() < node.getData().getYValue()) {
@@ -85,7 +80,7 @@ public class kdTree {
                 node.setLeft(new BinaryNode<City>(city));
                 return true;
             }
-            return insert(node.getLeft(), city, dimension + 1);
+            return helpInsert(node.getLeft(), city, dimension + 1);
         }
         // Returns false if equal
         if (node.getData().getXValue() == city.getXValue() && node.getData()
@@ -97,34 +92,18 @@ public class kdTree {
             node.setRight(new BinaryNode<City>(city));
             return true;
         }
-        return insert(node.getRight(), city, dimension + 1);
+        return helpInsert(node.getRight(), city, dimension + 1);
     }
-
-
+    
     /**
-     * Returns the tree printed out in order format
+     * This inserts using the helpInsert method
      * 
-     * @return String of the tree
+     * @param city
+     * @return
      */
-    public String printInOrder(BinaryNode<City> node) {
-        String str = "";
-
-        if (node == null) {
-            return str;
-        }
-
-        // left branch
-        str += printInOrder(node.getLeft());
-
-        // current value
-        str += node.toString() + "\n"; // current value
-
-        // right branch
-        str += printInOrder(node.getRight());
-
-        return str;
+    public boolean insert(City city) {
+    	return helpInsert(root, city, 0);
     }
-
 
     /**
      * Returns the tree printed out in pre-order format
