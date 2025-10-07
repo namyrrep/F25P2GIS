@@ -45,7 +45,7 @@ public class BSTree<T extends Comparable<T>> {
     private BinaryNode<T> insertHelp(BinaryNode<T> root, T e) {
         if (root == null)
             return new BinaryNode<T>(e);
-        if (e.compareTo(root.getData()) < 0)
+        if (e.compareTo(root.getData()) <= 0)
             root.setLeft(insertHelp(root.getLeft(), e));
         else
             root.setRight(insertHelp(root.getRight(), e));
