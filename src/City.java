@@ -92,7 +92,7 @@ public class City implements Comparable<City> {
      * @return String the city info
      */
     public String toString() {
-        return cityName + "(" + xValue + ", " + yValue + ")";
+        return cityName + " (" + xValue + ", " + yValue + ")";
     }
 
 

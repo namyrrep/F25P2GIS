@@ -8,6 +8,11 @@
 public class BSTree<T extends Comparable<T>> {
     private BinaryNode<T> root;
 
+    public BSTree() {
+        root = null;
+    }
+
+
     /**
      * 
      * @param key
@@ -40,7 +45,7 @@ public class BSTree<T extends Comparable<T>> {
     private BinaryNode<T> insertHelp(BinaryNode<T> root, T e) {
         if (root == null)
             return new BinaryNode<T>(e);
-        if (root.getData().compareTo(e) >= 0)
+        if (e.compareTo(root.getData()) < 0)
             root.setLeft(insertHelp(root.getLeft(), e));
         else
             root.setRight(insertHelp(root.getRight(), e));
@@ -53,6 +58,18 @@ public class BSTree<T extends Comparable<T>> {
      */
     public String toString() {
 
-        return "";
+        return helpPrint(root, 0, "");
+    }
+
+
+    private String helpPrint(BinaryNode<T> rt, int level, String spaces) {
+        String cur = "";
+        if (rt == null)
+            return "";
+        cur += helpPrint(rt.getLeft(), level + 1, spaces + "  ");
+        cur += level + spaces + rt.getData().toString() + "\n";
+        cur += helpPrint(rt.getRight(), level + 1, spaces + "  ");
+
+        return cur;
     }
 }

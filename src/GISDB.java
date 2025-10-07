@@ -34,8 +34,8 @@ public class GISDB implements GIS {
      * Create a new GISDB object.
      */
     public GISDB() {
-        bTree = new BSTree<City>(null);
-        kTree = new kdTree(null);
+        bTree = new BSTree<City>();
+        kTree = new kdTree();
     }
 
 
@@ -70,7 +70,7 @@ public class GISDB implements GIS {
         if (x >= 0 && x < MAXCOORD && y >= 0 && y < MAXCOORD) {
             City newCity = new City(name, x, y);
             // If kTree already has cords return false and escape,
-            if (kTree.insert(newCity)) {
+            if (kTree.insert(null, newCity, 0)) {
                 bTree.insert(newCity);
                 return true;
             }
@@ -193,6 +193,6 @@ public class GISDB implements GIS {
      * @return String listing the cities as specified.
      */
     public String print() {
-        return "";
+        return bTree.toString();
     }
 }

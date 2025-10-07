@@ -2,3 +2,36 @@ This file should contain one of two things: Either a complete transcript
 showing the prompts and responses for any LLM use that helped you to complete
 this project, or else a statement saying that you did not use any LLM to help
 you to complete this project.
+
+User: Wwhat is the current error in my BST insert?
+
+AI: Looking at your BST insert method, there's a logical error in the comparison condition. Currently you have:
+
+if (root.getData().compareTo(e) >= 0)
+    root.setLeft(insertHelp(root.getLeft(), e));
+The issue is with the >= 0 condition. In a proper BST:
+
+	•  Values less than the current node should go to the left
+	•  Values greater than the current node should go to the right
+	•  Equal values should typically go to the left (or right, but be consistent)
+
+Your current logic puts values that are greater than or equal to the current node on the left, which is backwards.
+
+Here's the corrected version:
+private BinaryNode<T> insertHelp(BinaryNode<T> root, T e) {
+    if (root == null)
+        return new BinaryNode<T>(e);
+    if (e.compareTo(root.getData()) <= 0)
+        root.setLeft(insertHelp(root.getLeft(), e));
+    else
+        root.setRight(insertHelp(root.getRight(), e));
+    return root;
+}
+
+The key changes:
+
+	1. Compare e.compareTo(root.getData()) instead of root.getData().compareTo(e)
+	2. Use <= 0 to put smaller/equal values on the left
+	3. Put larger values on the right
+
+This ensures your BST maintains the proper ordering property where left subtree contains smaller values and right subtree contains larger values.
