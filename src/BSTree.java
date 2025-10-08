@@ -12,26 +12,6 @@ public class BSTree<T extends Comparable<T>> {
         root = null;
     }
 
-
-    /**
-     * 
-     * @param key
-     *            value needed for node
-     */
-    public BSTree(T key) {
-        root = new BinaryNode<T>(key);
-    }
-
-
-    /**
-     * 
-     * @return BinaryNode<T> returns the current root
-     */
-    public BinaryNode<T> getRoot() {
-        return root;
-    }
-
-
     /**
      * 
      * @param input

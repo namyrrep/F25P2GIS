@@ -34,14 +34,6 @@ public class BinaryNode<T> {
 
 
     /**
-     * This is the setter method for data field.
-     */
-    public void setData(T newData) {
-        data = newData;
-    }
-
-
-    /**
      * This is the getter method for left field.
      * 
      * @return BinaryNode<T> returns the node on the left

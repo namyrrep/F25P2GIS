@@ -10,26 +10,6 @@ public class kdTree {
 
 
     /**
-     * Initializes a new tree
-     * 
-     * @param currentCity
-     */
-    public kdTree(City currentCity) {
-        root = new BinaryNode<City>(currentCity);
-    }
-
-
-    /**
-     * Gets the current root
-     * 
-     * @return BinaryNode<City> returns the node
-     */
-    public BinaryNode<City> getRoot() {
-        return root;
-    }
-
-
-    /**
      * Sets the current root to the given parameter
      * 
      * @param BinaryNode<City>
@@ -45,7 +25,10 @@ public class kdTree {
      * @param city
      * @return boolean if successfully inserted
      */
-    private boolean helpInsert(BinaryNode<City> node, City city, int dimension) {
+    private boolean helpInsert(
+        BinaryNode<City> node,
+        City city,
+        int dimension) {
         // If root is null, add city to the root.
         if (root == null) {
             this.setRoot(new BinaryNode<City>(city));
@@ -94,7 +77,8 @@ public class kdTree {
         }
         return helpInsert(node.getRight(), city, dimension + 1);
     }
-    
+
+
     /**
      * This inserts using the helpInsert method
      * 
@@ -102,8 +86,9 @@ public class kdTree {
      * @return
      */
     public boolean insert(City city) {
-    	return helpInsert(root, city, 0);
+        return helpInsert(root, city, 0);
     }
+
 
     /**
      * Returns the tree printed out in pre-order format
@@ -119,16 +104,16 @@ public class kdTree {
         if (node == null) {
             return str;
         }
-        
-        //left branch
+
+        // left branch
         str += printPreOrder(node.getLeft(), dimension + 1, spaces + "  ");
-        
-        //current value
+
+        // current value
         str += dimension + spaces + node.getData().toString() + "\n";
-        
-        //right branch
+
+        // right branch
         str += printPreOrder(node.getRight(), dimension + 1, spaces + "  ");
-        
+
         return str;
     }
 
@@ -140,21 +125,6 @@ public class kdTree {
      */
     public String debug() {
         return printPreOrder(root, 0, "");
-    }
-
-
-    /**
-     * Deletes the first instance of the parameterized coordinates.
-     * 
-     * @param x
-     *            - The X coordinate for possible deletion
-     * @param y
-     *            - The Y coordinate for possible deletion
-     * @return Name of the city deleted
-     */
-    public String deleteByCo(int x, int y) {
-
-        return "";
     }
 
 }

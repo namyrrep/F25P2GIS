@@ -46,8 +46,8 @@ public class GISDB implements GIS {
      * @return True if the database has been cleared
      */
     public boolean clear() {
-        bTree = new BSTree<City>(null);
-        kTree = new kdTree(null);
+        bTree = new BSTree<City>();
+        kTree = new kdTree();
         return true;
     }
 

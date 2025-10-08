@@ -80,13 +80,74 @@ public class GISTest extends TestCase {
             + "3      Washington (5, 350)\n" + "1  Atlanta (10, 500)\n"
             + "2    L (11, 500)\n" + "0Chicago (100, 150)\n"
             + "1  Tacoma (1000, 100)\n" + "2    L (101, 150)\n", it.debug());
-        /**assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
-        assertFuzzyEquals("L", it.info(101, 150));
-        assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
-        assertFuzzyEquals("3\nChicago", it.delete(100, 150));
-        assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
-            + "Baltimore (0, 300)\n" + "Washington (5, 350)\n"
-            + "L (11, 500)\n5", it.search(0, 0, 2000));
-        assertFuzzyEquals("Baltimore (0, 300)\n4", it.search(0, 300, 0))*/
+        /**
+         * assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
+         * assertFuzzyEquals("L", it.info(101, 150));
+         * assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
+         * assertFuzzyEquals("3\nChicago", it.delete(100, 150));
+         * assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
+         * + "Baltimore (0, 300)\n" + "Washington (5, 350)\n"
+         * + "L (11, 500)\n5", it.search(0, 0, 2000));
+         * assertFuzzyEquals("Baltimore (0, 300)\n4", it.search(0, 300, 0))
+         */
+    }
+
+
+    /**
+     * Tests the city class
+     * 
+     * @throws IOException
+     */
+    public void testCity() throws IOException {
+        City myCity = new City("Hi", 1, 1);
+        City otherCity = new City("Hi", 2, 2);
+
+        assertEquals(myCity.getCityName(), "Hi");
+        myCity.setCityName("Richmond");
+        assertEquals(myCity.getCityName(), "Richmond");
+
+        myCity.setXValue(2);
+        assertEquals(myCity.getXValue(), 2);
+        myCity.setYValue(2);
+        assertEquals(myCity.getYValue(), 2);
+
+        assertTrue(myCity.equals(myCity));
+        assertFalse(myCity.equals(null));
+        assertFalse(myCity.equals(it));
+        assertFalse(myCity.equals(otherCity));
+        otherCity.setCityName("Richmond");
+        assertTrue(myCity.equals(otherCity));
+        otherCity.setXValue(1);
+        assertFalse(myCity.equals(otherCity));
+        otherCity.setXValue(2);
+        otherCity.setYValue(1);
+        assertFalse(myCity.equals(otherCity));
+    }
+
+
+    /**
+     * Edwin's Tests for kdTree
+     * 
+     * @throws IOException
+     */
+    public void testKDTree() throws IOException {
+        assertTrue(it.insert("root", 100, 100));
+        assertTrue(it.insert("left", 75, 100));
+        assertTrue(it.insert("right", 125, 100));
+        assertTrue(it.insert("left2", 75, 75));
+        assertTrue(it.insert("right2", 125, 125));
+        assertTrue(it.insert("left3", 75, 125));
+        assertTrue(it.insert("right3", 125, 75));
+        assertTrue(it.insert("left4", 50, 100));
+        assertTrue(it.insert("right4", 150, 100));
+        assertFalse(it.insert("why", 100, 100));
+        assertFalse(it.insert("me", 75, 100));
+        assertTrue(it.insert("Tester", 100, 150));
+        assertFuzzyEquals(it.debug(), "2    left2 (75, 75)\r\n"
+            + "1  left (75, 100)\r\n" + "3      left4 (50, 100)\r\n"
+            + "2    left3 (75, 125)\r\n" + "0root (100, 100)\r\n"
+            + "2    right3 (125, 75)\r\n" + "1  right (125, 100)\r\n"
+            + "3      Tester (100, 150)\r\n" + "2    right2 (125, 125)\r\n"
+            + "3      right4 (150, 100)");
     }
 }
