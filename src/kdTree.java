@@ -137,7 +137,7 @@ public class kdTree {
         return helpInfo(node.getRight(), x, y, dimension + 1);
     }
 
- /**
+  /**
      * Returns a list of City's in the radius r away from the location (x, y).
      * 
      * @param x
@@ -146,10 +146,11 @@ public class kdTree {
 	 * @return String List of City's and # of nodes visited
 	 */
     public String search(int x, int y, int r) {
-    	return helpSearch(root, x, y, r, 0);
+    	int count[] = {0};
+    	return helpSearch(root, x, y, r, count) + count[0];
     }
     
-    /**
+  /**
      * The helper method for the search method. 
      * 
      * @param node
@@ -159,7 +160,7 @@ public class kdTree {
      * @param num
 	 * @return String List of City's and # of nodes visited
 	 */
-    public String helpSearch(BinaryNode<City> node, int x, int y, int r, int num) {
+    public String helpSearch(BinaryNode<City> node, int x, int y, int r, int num[]) {
     	//If root is null, there are no City's in radius.
     	if (root == null) {
     		return "";
@@ -168,6 +169,7 @@ public class kdTree {
     	if (node == null) {
     		return "";
     	}
+    	num[0]++;
     	String result = "";
     	//Calculate using the function for a circle.
     	double distance = (Math.pow(r, 2) - 
@@ -177,7 +179,6 @@ public class kdTree {
     	//Do both children
     	if (distance >= 0) {
     		result += node.getData().toString()+"\n";
-    		num++;
     		result += helpSearch(node.getLeft(), x, y, r, num);
     		result += helpSearch(node.getRight(), x, y, r, num);
     	}
