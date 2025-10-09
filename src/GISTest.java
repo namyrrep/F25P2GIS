@@ -157,7 +157,7 @@ public class GISTest extends TestCase {
         assertEquals(it.info(125, 100), "right");
         assertEquals(it.info(75, 75), "left2");
         assertEquals(it.info(125, 125), "right2");
-        assertEquals(it.info(50, 100), "left3");
+        assertEquals(it.info(75, 125), "left3");
         assertEquals(it.info(125, 75), "right3");
         assertEquals(it.info(50, 100), "left4");
         assertEquals(it.info(150, 100), "right4");
