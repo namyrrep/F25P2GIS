@@ -1,21 +1,26 @@
 /**
+ * The BSTree is an implementation of the Binary Search Tree using OPENDSA notes
  * 
- */
-
-/**
- * 
+ * @author William Perryman & Edwin Barrack
+ * @version 10/9/2025
  */
 public class BSTree<T extends Comparable<T>> {
     private BinaryNode<T> root;
 
+    /**
+     * Constructor for BSTree
+     */
     public BSTree() {
         root = null;
     }
 
 
     /**
+     * Inserts a value by passing it through to insert help a recursive
+     * function from there it checks which way it should go by comparing
      * 
      * @param input
+     *            is the value given
      * @return boolean if correctly inserted
      */
     public void insert(T e) {
@@ -35,6 +40,9 @@ public class BSTree<T extends Comparable<T>> {
 
 
     /**
+     * Puts the tree in a string format, passes it through to a private
+     * helpPrint method doing an in order print style
+     * 
      * @return String of the tree
      */
     public String toString() {
@@ -48,6 +56,7 @@ public class BSTree<T extends Comparable<T>> {
      * 
      * @param T
      *            from whatever data type is passed in
+     * @return String depending on if a node is found or not
      */
     public String findNode(T input) {
 
@@ -75,10 +84,12 @@ public class BSTree<T extends Comparable<T>> {
 
 
     /**
-     * Finds the the nodes and prints.
+     * Finds the the nodes and prints in order
      * 
      * @param rt
+     *            the root of the node given
      * @param level
+     *            what current level we are on
      * @param spaces
      * @return cur containing all the info.
      */

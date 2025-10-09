@@ -1,6 +1,10 @@
 /**
  * This is the City class that stores the cityRecords that we are using to sort
  * in trees.
+ * 
+ * @author William Perryman & Edwin Barrack
+ * 
+ * @version 10/9/2025
  */
 public class City implements Comparable<City> {
     private String cityName;
@@ -9,6 +13,13 @@ public class City implements Comparable<City> {
 
     /**
      * This is parameterized constructor for the City class.
+     * 
+     * @param name
+     *            is the given city name
+     * @param x
+     *            is the given city x cord
+     * @param y
+     *            is the given city y cord
      */
     public City(String name, int x, int y) {
         this.cityName = name;
@@ -33,7 +44,7 @@ public class City implements Comparable<City> {
     /**
      * This is the getter method for cityName field.
      * 
-     * @return String name of the c
+     * @return String name of the city
      */
     public String getCityName() {
         return cityName;
@@ -42,6 +53,9 @@ public class City implements Comparable<City> {
 
     /**
      * This is the setter method for cityName field.
+     * 
+     * @param newName
+     *            is the new name of the city
      */
     public void setCityName(String newName) {
         cityName = newName;
@@ -51,7 +65,7 @@ public class City implements Comparable<City> {
     /**
      * This is the getter method for xValue field.
      * 
-     * @return int the x value
+     * @return int the current x value
      */
     public int getXValue() {
         return xValue;
@@ -60,6 +74,9 @@ public class City implements Comparable<City> {
 
     /**
      * This is the setter method for xValue field.
+     * 
+     * @param newX
+     *            is the new x cord
      */
     public void setXValue(int newX) {
         xValue = newX;
@@ -78,6 +95,9 @@ public class City implements Comparable<City> {
 
     /**
      * This is the setter method for yValue field.
+     * 
+     * @param newY
+     *            is the new Y value
      */
     public void setYValue(int newY) {
         yValue = newY;
@@ -100,6 +120,8 @@ public class City implements Comparable<City> {
      * This is the equals method for the City class.
      * 
      * @Override
+     * @param otherCity
+     *            is the possible other city
      * 
      * @return boolean true if they are equal false if not
      */

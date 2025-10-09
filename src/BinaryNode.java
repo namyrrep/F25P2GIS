@@ -1,9 +1,8 @@
 /**
  * 
- */
-
-/**
+ * @author William Perryman & Edwin Barrack
  * 
+ * @version 10/9/2025
  */
 public class BinaryNode<T> {
     private T data;
@@ -15,6 +14,7 @@ public class BinaryNode<T> {
      * value T
      * 
      * @param value
+     *            is the given data input
      */
     public BinaryNode(T value) {
         this.data = value;
@@ -46,6 +46,9 @@ public class BinaryNode<T> {
     /**
      * This is the setter method for left field.
      * 
+     * @param newLeft
+     *            is the new node being set as the left pointer
+     * 
      */
     public void setLeft(BinaryNode<T> newLeft) {
         left = newLeft;
@@ -64,6 +67,8 @@ public class BinaryNode<T> {
 
     /**
      * This is the setter method for right field.
+     * 
+     * @param newRight is the new node on the right
      */
     public void setRight(BinaryNode<T> newRight) {
         right = newRight;
