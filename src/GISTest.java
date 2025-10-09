@@ -150,4 +150,19 @@ public class GISTest extends TestCase {
             + "3      Tester (100, 150)\r\n" + "2    right2 (125, 125)\r\n"
             + "3      right4 (150, 100)");
     }
+
+
+    /**
+     * Will's Test for BSTree
+     * 
+     * @throws IOException
+     */
+    public void testBSTree() throws IOException {
+        assertTrue(it.insert("root", 100, 100));
+        assertTrue(it.insert("left", 75, 100));
+        assertTrue(it.insert("left", 75, 101));
+        assertTrue(it.insert("right", 125, 100));
+
+        System.out.println(it.info("left"));
+    }
 }

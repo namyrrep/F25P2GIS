@@ -35,3 +35,24 @@ The key changes:
 	3. Put larger values on the right
 
 This ensures your BST maintains the proper ordering property where left subtree contains smaller values and right subtree contains larger values.
+
+return bTree.findNode(name); why is this returning an error?
+
+The method findNode(City) in the type BSTree is not applicable for arguments String
+
+The issue is a type mismatch. Your bTree is declared as BSTree<City>, so the findNode method expects a City object, but you're passing a String (the city name).
+
+You need to create a temporary City object with the name you're searching for.
+ Since the BST compares cities by name only (as defined in City.compareTo)
+, the x and y values don't matter for the search:
+public String info(String name) {
+    City searchCity = new City(name, 0, 0);
+    return bTree.findNode(searchCity);
+}
+
+The City.compareTo method only compares city names:
+public int compareTo(City other) {
+    return this.cityName.compareTo(other.cityName);
+}
+So creating a temporary City object with coordinates (0, 0) will work correctly for searching by name, 
+since only the name field is used in the comparison.

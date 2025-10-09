@@ -12,6 +12,7 @@ public class BSTree<T extends Comparable<T>> {
         root = null;
     }
 
+
     /**
      * 
      * @param input
@@ -42,6 +43,43 @@ public class BSTree<T extends Comparable<T>> {
     }
 
 
+    /**
+     * Finds the node given T input
+     * 
+     * @param T from whatever data type is passed in
+     */
+    public String findNode(T input) {
+
+        return findNodeHelper(root, input);
+    }
+    
+    private String findNodeHelper(BinaryNode<T> base, T target) {
+        if(base == null)
+            return "";
+        String result = "";
+        if(base.getData().compareTo(target) == 0) {
+            result += base.getData().toString() + "\n";
+            result += findNodeHelper(base.getLeft(), target);
+        }
+        else if(base.getData().compareTo(target) > 0) {
+            result += findNodeHelper(base.getLeft(), target);
+        }
+        else {
+            result += findNodeHelper(base.getRight(), target);
+        }
+        
+        return result;
+    }
+
+
+    /**
+     * Finds the the nodes and prints.
+     * 
+     * @param rt
+     * @param level
+     * @param spaces
+     * @return cur containing all the info.
+     */
     private String helpPrint(BinaryNode<T> rt, int level, String spaces) {
         String cur = "";
         if (rt == null)

@@ -141,7 +141,9 @@ public class GISDB implements GIS {
      * @return String representing the cities found
      */
     public String info(String name) {
-        return "";
+        //To pass into a BSTree it needs to be a city type, so I make a city to pass through
+        City infoCity = new City(name, 0, 0);
+        return bTree.findNode(infoCity);
     }
 
 
