@@ -8,7 +8,6 @@ public class kdTree {
         root = null;
     }
 
-
     /**
      * Sets the current root to the given parameter
      * 
@@ -25,10 +24,7 @@ public class kdTree {
      * @param city
      * @return boolean if successfully inserted
      */
-    private boolean helpInsert(
-        BinaryNode<City> node,
-        City city,
-        int dimension) {
+    private boolean helpInsert(BinaryNode<City> node, City city, int dimension) {
         // If root is null, add city to the root.
         if (root == null) {
             this.setRoot(new BinaryNode<City>(city));
@@ -77,8 +73,7 @@ public class kdTree {
         }
         return helpInsert(node.getRight(), city, dimension + 1);
     }
-
-
+    
     /**
      * This inserts using the helpInsert method
      * 
@@ -86,10 +81,124 @@ public class kdTree {
      * @return
      */
     public boolean insert(City city) {
-        return helpInsert(root, city, 0);
+    	return helpInsert(root, city, 0);
     }
-
-
+    
+    
+    
+    
+    /**
+     * Returns the City at (x, y) if possible
+     * 
+     * @param x
+     * @param y
+     * @return String Name of City
+     */
+    public String info(int x, int y) {
+    	return helpInfo(root, x, y, 0);
+    }
+    
+    /**
+     * This is the helper method for info
+     * 
+     * @param node
+     * @param x
+     * @param y
+     * @param dimension
+     * @return String Name of City 
+     */
+    public String helpInfo(BinaryNode<City> node, int x, int y, int dimension) {
+    	//If the root is null, there are no City's in this tree.
+    	if (root == null) {
+    		return null;
+    	}
+    	
+    	//Returns if the correct coordinates are found.
+    	if (x == node.getData().getXValue() && 
+    		y == node.getData().getYValue()) {
+    			return node.getData().getCityName();
+    	}
+    	
+    	//Search by x
+    	if (dimension % 2 == 0) { 
+    		if (x < node.getData().getXValue()) {
+    			if (node.getLeft() != null) {
+    				return helpInfo(node.getLeft(), x, y, dimension + 1);
+    			}
+    			return null;
+    		}
+    		if (node.getRight() != null) {
+    			return helpInfo(node.getRight(), x, y, dimension + 1);
+    		}
+    		return null;
+    	} 
+    	//Search by y
+    	if (y < node.getData().getYValue()) {
+    		if (node.getLeft() != null) {
+    			return helpInfo(node.getLeft(), x, y, dimension + 1);
+    		}
+    		return null;
+    	}
+    	if (node.getRight() != null) {
+    		return helpInfo(node.getRight(), x, y, dimension + 1);
+    	}
+    	return null;
+    }
+    
+    /**
+     * Returns a list of City's in the radius r away from the location (x, y).
+     * 
+     * @param x
+     * @param y
+     * @param r
+	 * @return String List of City's and # of nodes visited
+	 */
+    public String search(int x, int y, int r) {
+    	return helpSearch(root, x, y, r, 0);
+    }
+    
+    /**
+     * The helper method for the search method. 
+     * 
+     * @param node
+     * @param x
+     * @param y
+     * @param r
+     * @param dimension
+	 * @return String List of City's and # of nodes visited
+	 */
+    public String helpSearch(BinaryNode<City> node, int x, int y, int r, int dimension) {
+    	//If root is null, there are no City's in radius.
+    	if (root == null) {
+    		return "";
+    	}
+    	
+    	//Search by x
+    	if (dimension % 2 == 0) { 
+    		if (x < node.getData().getXValue()) {
+    			if (node.getLeft() != null) {
+    				return helpInfo(node.getLeft(), x, y, dimension + 1);
+    			}
+    			return null;
+    		}
+    		if (node.getRight() != null) {
+    			return helpInfo(node.getRight(), x, y, dimension + 1);
+    		}
+    		return null;
+    	} 
+    	//Search by y
+    	if (y < node.getData().getYValue()) {
+    		if (node.getLeft() != null) {
+    			return helpInfo(node.getLeft(), x, y, dimension + 1);
+    		}
+    		return null;
+    	}
+    	if (node.getRight() != null) {
+    		return helpInfo(node.getRight(), x, y, dimension + 1);
+    	}
+    	return null;
+    }
+    
     /**
      * Returns the tree printed out in pre-order format
      * 
@@ -104,16 +213,16 @@ public class kdTree {
         if (node == null) {
             return str;
         }
-
-        // left branch
+        
+        //left branch
         str += printPreOrder(node.getLeft(), dimension + 1, spaces + "  ");
-
-        // current value
+        
+        //current value
         str += dimension + spaces + node.getData().toString() + "\n";
-
-        // right branch
+        
+        //right branch
         str += printPreOrder(node.getRight(), dimension + 1, spaces + "  ");
-
+        
         return str;
     }
 
@@ -125,6 +234,21 @@ public class kdTree {
      */
     public String debug() {
         return printPreOrder(root, 0, "");
+    }
+
+
+    /**
+     * Deletes the first instance of the parameterized coordinates.
+     * 
+     * @param x
+     *            - The X coordinate for possible deletion
+     * @param y
+     *            - The Y coordinate for possible deletion
+     * @return Name of the city deleted
+     */
+    public String deleteByCo(int x, int y) {
+
+        return "";
     }
 
 }
