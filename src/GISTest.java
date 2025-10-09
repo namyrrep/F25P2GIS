@@ -162,6 +162,15 @@ public class GISTest extends TestCase {
         assertEquals(it.info(50, 100), "left4");
         assertEquals(it.info(150, 100), "right4");
         assertEquals(it.info(100, 150), "Tester");
+
+        assertFuzzyEquals("root (100, 100)\r\n" + "left (75, 100)\r\n"
+            + "left2 (75, 75)\r\n" + "left3 (75, 125)\r\n"
+            + "left4 (50, 100)\r\n" + "right (125, 100)\r\n"
+            + "right3 (125, 75)\r\n" + "right2 (125, 125)\r\n"
+            + "Tester (100, 150)\r\n" + "right4 (150, 100)\r\n" + "10", it
+                .search(100, 100, 50));
+        assertFuzzyEquals("root (100, 100)\r\n" + "left (75, 100)\r\n"
+            + "right (125, 100)\r\n" + "7", it.search(100, 100, 25));
     }
 
 

@@ -56,3 +56,13 @@ public int compareTo(City other) {
 }
 So creating a temporary City object with coordinates (0, 0) will work correctly for searching by name, 
 since only the name field is used in the comparison.
+
+User: what is the possible way, to incldue an integer in the recurrsion to only call it back at the end for search
+
+Looking at your k-d tree search implementation, you want to track the number of nodes visited during the search.
+ The most efficient way is to use a wrapper class or array reference to maintain the count across recursive calls.
+ public String search(int x, int y, int r) {
+    int[] visitCount = {0}; // Array to hold the count by reference
+    String cities = helpSearch(root, x, y, r, 0, visitCount);
+    return cities + visitCount[0]; // Append count at the end
+}

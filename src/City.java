@@ -115,7 +115,7 @@ public class City implements Comparable<City> {
         // Gets a City object from the parameterized Object.
         City city = (City)otherCity;
 
-        return this.getCityName().equals(city.getCityName()) && this.xValue == city.xValue
-            && this.yValue == city.yValue;
+        return this.getCityName().equals(city.getCityName())
+            && this.xValue == city.xValue && this.yValue == city.yValue;
     }
 }

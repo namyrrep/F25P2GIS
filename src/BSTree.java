@@ -46,28 +46,30 @@ public class BSTree<T extends Comparable<T>> {
     /**
      * Finds the node given T input
      * 
-     * @param T from whatever data type is passed in
+     * @param T
+     *            from whatever data type is passed in
      */
     public String findNode(T input) {
 
         return findNodeHelper(root, input);
     }
-    
+
+
     private String findNodeHelper(BinaryNode<T> base, T target) {
-        if(base == null)
+        if (base == null)
             return "";
         String result = "";
-        if(base.getData().compareTo(target) == 0) {
+        if (base.getData().compareTo(target) == 0) {
             result += base.getData().toString() + "\n";
             result += findNodeHelper(base.getLeft(), target);
         }
-        else if(base.getData().compareTo(target) > 0) {
+        else if (base.getData().compareTo(target) > 0) {
             result += findNodeHelper(base.getLeft(), target);
         }
         else {
             result += findNodeHelper(base.getRight(), target);
         }
-        
+
         return result;
     }
 

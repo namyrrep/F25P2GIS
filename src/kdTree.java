@@ -137,54 +137,61 @@ public class kdTree {
         return helpInfo(node.getRight(), x, y, dimension + 1);
     }
 
-  /**
+
+    /**
      * Returns a list of City's in the radius r away from the location (x, y).
      * 
      * @param x
      * @param y
      * @param r
-	 * @return String List of City's and # of nodes visited
-	 */
+     * @return String List of City's and # of nodes visited
+     */
     public String search(int x, int y, int r) {
-    	int count[] = {0};
-    	return helpSearch(root, x, y, r, count) + count[0];
+        int count[] = { 0 };
+        return helpSearch(root, x, y, r, count) + count[0];
     }
-    
-  /**
-     * The helper method for the search method. 
+
+
+    /**
+     * The helper method for the search method.
      * 
      * @param node
      * @param x
      * @param y
      * @param r
      * @param num
-	 * @return String List of City's and # of nodes visited
-	 */
-    public String helpSearch(BinaryNode<City> node, int x, int y, int r, int num[]) {
-    	//If root is null, there are no City's in radius.
-    	if (root == null) {
-    		return "";
-    	}
-    	//Returns "" if node is null
-    	if (node == null) {
-    		return "";
-    	}
-    	num[0]++;
-    	String result = "";
-    	//Calculate using the function for a circle.
-    	double distance = (Math.pow(r, 2) - 
-    					   Math.pow((x - node.getData().getXValue()), 2)) -  
-    					   Math.pow((y - node.getData().getYValue()), 2);
-    	
-    	//Do both children
-    	if (distance >= 0) {
-    		result += node.getData().toString()+"\n";
-    		result += helpSearch(node.getLeft(), x, y, r, num);
-    		result += helpSearch(node.getRight(), x, y, r, num);
-    	}
-    	//No children otherwise.
-    	return result;
+     * @return String List of City's and # of nodes visited
+     */
+    public String helpSearch(
+        BinaryNode<City> node,
+        int x,
+        int y,
+        int r,
+        int num[]) {
+        // If root is null, there are no City's in radius.
+        if (root == null) {
+            return "";
+        }
+        // Returns "" if node is null
+        if (node == null) {
+            return "";
+        }
+        num[0]++;
+        String result = "";
+        // Calculate using the function for a circle.
+        double distance = (Math.pow(r, 2) - Math.pow((x - node.getData()
+            .getXValue()), 2)) - Math.pow((y - node.getData().getYValue()), 2);
+
+        // Do both children
+        if (distance >= 0) {
+            result += node.getData().toString() + "\n";
+            result += helpSearch(node.getLeft(), x, y, r, num);
+            result += helpSearch(node.getRight(), x, y, r, num);
+        }
+        // No children otherwise.
+        return result;
     }
+
 
     /**
      * Returns the tree printed out in pre-order format
