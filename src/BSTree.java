@@ -30,7 +30,7 @@ public class BSTree<T extends Comparable<T>> {
             node.setLeft(insertHelp(node.getLeft(), e));
         else
             node.setRight(insertHelp(node.getRight(), e));
-        return root;
+        return node;
     }
 
 
