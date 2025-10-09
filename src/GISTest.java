@@ -179,7 +179,7 @@ public class GISTest extends TestCase {
         System.out.println(it.info("left"));
         assertFuzzyEquals("left (75, 100)\r\n" + "left (75, 101)\r\n" + "", it
             .info("left"));
-        
+
         assertFuzzyEquals("right (125, 100)\n", it.info("right"));
         assertEquals("", it.info("wrong"));
     }
