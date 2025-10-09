@@ -132,6 +132,7 @@ public class GISTest extends TestCase {
      * @throws IOException
      */
     public void testKDTree() throws IOException {
+        assertEquals(it.info(100, 100), "");
         assertTrue(it.insert("root", 100, 100));
         assertTrue(it.insert("left", 75, 100));
         assertTrue(it.insert("right", 125, 100));
@@ -150,6 +151,17 @@ public class GISTest extends TestCase {
             + "2    right3 (125, 75)\r\n" + "1  right (125, 100)\r\n"
             + "3      Tester (100, 150)\r\n" + "2    right2 (125, 125)\r\n"
             + "3      right4 (150, 100)");
+
+        assertEquals(it.info(100, 100), "root");
+        assertEquals(it.info(75, 100), "left");
+        assertEquals(it.info(125, 100), "right");
+        assertEquals(it.info(75, 75), "left2");
+        assertEquals(it.info(125, 125), "right2");
+        assertEquals(it.info(50, 100), "left3");
+        assertEquals(it.info(125, 75), "right3");
+        assertEquals(it.info(50, 100), "left4");
+        assertEquals(it.info(150, 100), "right4");
+        assertEquals(it.info(100, 150), "Tester");
     }
 
 
