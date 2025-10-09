@@ -1,10 +1,14 @@
 /**
- * 
+ * This class represents are kdTree, a binary tree that switches
+ * between sorting by x and y coordinates.
  */
-public class kdTree {
+public class kDTree {
     private BinaryNode<City> root;
 
-    public kdTree() {
+    /**
+     * The basic constructor that takes no parameters
+     */
+    public kDTree() {
         root = null;
     }
 
@@ -83,7 +87,7 @@ public class kdTree {
      * This inserts using the helpInsert method
      * 
      * @param city
-     * @return
+     * @return boolean
      */
     public boolean insert(City city) {
         return helpInsert(root, city, 0);
@@ -147,7 +151,7 @@ public class kdTree {
      * @return String List of City's and # of nodes visited
      */
     public String search(int x, int y, int r) {
-        int count[] = { 0 };
+        int[] count = { 0 };
         return helpSearch(root, x, y, r, count) + count[0];
     }
 
@@ -162,12 +166,12 @@ public class kdTree {
      * @param num
      * @return String List of City's and # of nodes visited
      */
-    public String helpSearch(
+    private String helpSearch(
         BinaryNode<City> node,
         int x,
         int y,
         int r,
-        int num[]) {
+        int[] num) {
         // If root is null, there are no City's in radius.
         if (root == null) {
             return "";
@@ -176,7 +180,6 @@ public class kdTree {
         if (node == null) {
             return "";
         }
-        num[0]++;
         String result = "";
         // Calculate using the function for a circle.
         double distance = (Math.pow(r, 2) - Math.pow((x - node.getData()
@@ -185,6 +188,7 @@ public class kdTree {
         // Do both children
         if (distance >= 0) {
             result += node.getData().toString() + "\n";
+            num[0]++;
             result += helpSearch(node.getLeft(), x, y, r, num);
             result += helpSearch(node.getRight(), x, y, r, num);
         }
@@ -196,6 +200,9 @@ public class kdTree {
     /**
      * Returns the tree printed out in pre-order format
      * 
+     * @param node
+     * @param dimension
+     * @param spaces
      * @return String of the tree
      */
     private String printPreOrder(
