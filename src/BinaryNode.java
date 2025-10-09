@@ -1,6 +1,7 @@
 /**
  * 
- * @author William Perryman & Edwin Barrack
+ * @author William Perryman
+ * @author Edwin Barrack
  * 
  * @version 10/9/2025
  */
@@ -68,7 +69,8 @@ public class BinaryNode<T> {
     /**
      * This is the setter method for right field.
      * 
-     * @param newRight is the new node on the right
+     * @param newRight
+     *            is the new node on the right
      */
     public void setRight(BinaryNode<T> newRight) {
         right = newRight;

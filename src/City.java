@@ -2,8 +2,8 @@
  * This is the City class that stores the cityRecords that we are using to sort
  * in trees.
  * 
- * @author William Perryman & Edwin Barrack
- * 
+ * @author William Perryman
+ * @author Edwin Barrack
  * @version 10/9/2025
  */
 public class City implements Comparable<City> {

@@ -84,7 +84,7 @@ public class GISTest extends TestCase {
         assertFuzzyEquals("L", it.info(101, 150));
         /**
          * 
-
+         * 
          * assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
          * assertFuzzyEquals("3\nChicago", it.delete(100, 150));
          * assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
