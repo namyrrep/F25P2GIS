@@ -80,8 +80,9 @@ public class GISTest extends TestCase {
             + "3      Washington (5, 350)\n" + "1  Atlanta (10, 500)\n"
             + "2    L (11, 500)\n" + "0Chicago (100, 150)\n"
             + "1  Tacoma (1000, 100)\n" + "2    L (101, 150)\n", it.debug());
+        assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
         /**
-         * assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
+         * 
          * assertFuzzyEquals("L", it.info(101, 150));
          * assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
          * assertFuzzyEquals("3\nChicago", it.delete(100, 150));
@@ -164,5 +165,10 @@ public class GISTest extends TestCase {
         assertTrue(it.insert("right", 125, 100));
 
         System.out.println(it.info("left"));
+        assertFuzzyEquals("left (75, 100)\r\n" + "left (75, 101)\r\n" + "", it
+            .info("left"));
+        
+        assertFuzzyEquals("right (125, 100)\n", it.info("right"));
+        assertEquals("", it.info("wrong"));
     }
 }
