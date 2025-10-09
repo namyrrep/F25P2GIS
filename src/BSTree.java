@@ -23,13 +23,13 @@ public class BSTree<T extends Comparable<T>> {
     }
 
 
-    private BinaryNode<T> insertHelp(BinaryNode<T> root, T e) {
-        if (root == null)
+    private BinaryNode<T> insertHelp(BinaryNode<T> node, T e) {
+        if (node == null)
             return new BinaryNode<T>(e);
-        if (e.compareTo(root.getData()) <= 0)
-            root.setLeft(insertHelp(root.getLeft(), e));
+        if (e.compareTo(node.getData()) <= 0)
+            node.setLeft(insertHelp(node.getLeft(), e));
         else
-            root.setRight(insertHelp(root.getRight(), e));
+            node.setRight(insertHelp(node.getRight(), e));
         return root;
     }
 
