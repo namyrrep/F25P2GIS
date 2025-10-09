@@ -128,7 +128,7 @@ public class GISDB implements GIS {
      * @return The city name if there is such a city, null otherwise
      */
     public String info(int x, int y) {
-        return kdTree.info(x, y);
+        return kTree.info(x, y);
     }
 
 
@@ -141,7 +141,8 @@ public class GISDB implements GIS {
      * @return String representing the cities found
      */
     public String info(String name) {
-        //To pass into a BSTree it needs to be a city type, so I make a city to pass through
+        // To pass into a BSTree it needs to be a city type, so I make a city to
+        // pass through
         City infoCity = new City(name, 0, 0);
         return bTree.findNode(infoCity);
     }
