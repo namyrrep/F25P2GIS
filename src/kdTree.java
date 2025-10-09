@@ -137,67 +137,53 @@ public class kdTree {
         return helpInfo(node.getRight(), x, y, dimension + 1);
     }
 
-
-    /**
+ /**
      * Returns a list of City's in the radius r away from the location (x, y).
      * 
      * @param x
      * @param y
      * @param r
-     * @return String List of City's and # of nodes visited
-     */
+	 * @return String List of City's and # of nodes visited
+	 */
     public String search(int x, int y, int r) {
-        return helpSearch(root, x, y, r, 0);
+    	return helpSearch(root, x, y, r, 0);
     }
-
-
+    
     /**
-     * The helper method for the search method.
+     * The helper method for the search method. 
      * 
      * @param node
      * @param x
      * @param y
      * @param r
-     * @param dimension
-     * @return String List of City's and # of nodes visited
-     */
-    public String helpSearch(
-        BinaryNode<City> node,
-        int x,
-        int y,
-        int r,
-        int dimension) {
-        // If root is null, there are no City's in radius.
-        if (root == null) {
-            return "";
-        }
-
-        // Search by x
-        if (dimension % 2 == 0) {
-            if (x < node.getData().getXValue()) {
-                if (node.getLeft() != null) {
-                    return helpInfo(node.getLeft(), x, y, dimension + 1);
-                }
-                return null;
-            }
-            if (node.getRight() != null) {
-                return helpInfo(node.getRight(), x, y, dimension + 1);
-            }
-            return null;
-        }
-        // Search by y
-        if (y < node.getData().getYValue()) {
-            if (node.getLeft() != null) {
-                return helpInfo(node.getLeft(), x, y, dimension + 1);
-            }
-            return null;
-        }
-        if (node.getRight() != null) {
-            return helpInfo(node.getRight(), x, y, dimension + 1);
-        }
-        return null;
+     * @param num
+	 * @return String List of City's and # of nodes visited
+	 */
+    public String helpSearch(BinaryNode<City> node, int x, int y, int r, int num) {
+    	//If root is null, there are no City's in radius.
+    	if (root == null) {
+    		return "";
+    	}
+    	//Returns "" if node is null
+    	if (node == null) {
+    		return "";
+    	}
+    	String result = "";
+    	//Calculate using the function for a circle.
+    	double distance = (Math.pow(r, 2) - 
+    					   Math.pow((x - node.getData().getXValue()), 2)) -  
+    					   Math.pow((y - node.getData().getYValue()), 2);
+    	
+    	//Do both children
+    	if (distance >= 0) {
+    		result += node.getData().toString()+"\n";
+    		num++;
+    		result += helpSearch(node.getLeft(), x, y, r, num);
+    		result += helpSearch(node.getRight(), x, y, r, num);
+    	}
+    	//No children otherwise.
+    	return result;
     }
-
 
     /**
      * Returns the tree printed out in pre-order format
