@@ -6,13 +6,13 @@
  * @author Edwin Barrack
  * @version 10/9/2025
  */
-public class kDTree {
+public class KDTree {
     private BinaryNode<City> root;
 
     /**
      * The basic constructor that takes no parameters
      */
-    public kDTree() {
+    public KDTree() {
         root = null;
     }
 
