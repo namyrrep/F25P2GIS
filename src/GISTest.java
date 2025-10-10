@@ -134,7 +134,7 @@ public class GISTest extends TestCase {
      */
     public void testKDTree() throws IOException {
         System.out.println(it.search(100, 100, 100));
-    	assertEquals(it.search(100, 100, 100), "0");
+        assertEquals(it.search(100, 100, 100), "0");
         assertEquals(it.info(100, 100), "");
         assertTrue(it.insert("root", 100, 100));
         assertTrue(it.insert("left", 75, 100));

@@ -1,9 +1,11 @@
 /**
  * The BSTree is an implementation of the Binary Search Tree using OPENDSA notes
  * 
- * @author William Perryman
- * @author Edwin Barrack
+ * @author William Perryman & Edwin Barrack
  * @version 10/9/2025
+ * 
+ * @param <T>
+ *            this class is generic
  */
 public class BSTree<T extends Comparable<T>> {
     private BinaryNode<T> root;

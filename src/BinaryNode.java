@@ -4,6 +4,9 @@
  * @author Edwin Barrack
  * 
  * @version 10/9/2025
+ * 
+ * @param <T>
+ *            this is a generic class
  */
 public class BinaryNode<T> {
     private T data;
