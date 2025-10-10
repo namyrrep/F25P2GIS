@@ -20,7 +20,7 @@ public class kDTree {
     /**
      * Sets the current root to the given parameter
      * 
-     * @param BinaryNode<City>
+     * @param BinaryNode<City> city Used
      */
     public void setRoot(BinaryNode<City> city) {
         root = city;
@@ -30,7 +30,7 @@ public class kDTree {
     /**
      * Insert function to add to the tree
      * 
-     * @param city
+     * @param city Used
      * @return boolean if successfully inserted
      */
     private boolean helpInsert(
@@ -90,7 +90,7 @@ public class kDTree {
     /**
      * This inserts using the helpInsert method
      * 
-     * @param city
+     * @param city Used
      * @return boolean
      */
     public boolean insert(City city) {
@@ -101,8 +101,8 @@ public class kDTree {
     /**
      * Returns the City at (x, y) if possible
      * 
-     * @param x
-     * @param y
+     * @param x Coordinate
+     * @param y Coordinate
      * @return String Name of City
      */
     public String info(int x, int y) {
@@ -113,10 +113,10 @@ public class kDTree {
     /**
      * This is the helper method for info
      * 
-     * @param node
-     * @param x
-     * @param y
-     * @param dimension
+     * @param node City
+     * @param x Coordinate
+     * @param y Coordinate
+     * @param dimension of tree
      * @return String Name of City
      */
     public String helpInfo(BinaryNode<City> node, int x, int y, int dimension) {
@@ -149,9 +149,9 @@ public class kDTree {
     /**
      * Returns a list of City's in the radius r away from the location (x, y).
      * 
-     * @param x
-     * @param y
-     * @param r
+     * @param x Coordinate
+     * @param y Coordinate
+     * @param r radius
      * @return String List of City's and # of nodes visited
      */
     public String search(int x, int y, int r) {
@@ -163,11 +163,11 @@ public class kDTree {
     /**
      * The helper method for the search method.
      * 
-     * @param node
-     * @param x
-     * @param y
-     * @param r
-     * @param num
+     * @param node of city
+     * @param x Coordinate
+     * @param y Coordinate
+     * @param r radius
+     * @param num cities
      * @return String List of City's and # of nodes visited
      */
     private String helpSearch(
@@ -204,9 +204,9 @@ public class kDTree {
     /**
      * Returns the tree printed out in pre-order format
      * 
-     * @param node
-     * @param dimension
-     * @param spaces
+     * @param node of city
+     * @param dimension of tree
+     * @param spaces added
      * @return String of the tree
      */
     private String printPreOrder(
@@ -235,7 +235,7 @@ public class kDTree {
     /**
      * Prints the pre-order helper method
      * 
-     * @return
+     * @return String
      */
     public String debug() {
         return printPreOrder(root, 0, "");
