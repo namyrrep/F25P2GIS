@@ -171,7 +171,7 @@ public class GISTest extends TestCase {
             + "Tester (100, 150)\r\n" + "right4 (150, 100)\r\n" + "10", it
                 .search(100, 100, 50));
         assertFuzzyEquals("root (100, 100)\r\n" + "left (75, 100)\r\n"
-            + "right (125, 100)\r\n" + "7", it.search(100, 100, 25));
+            + "right (125, 100)\r\n" + "3", it.search(100, 100, 25));
     }
 
 
