@@ -2,9 +2,9 @@
  * This class represents are kdTree, a binary tree that switches
  * between sorting by x and y coordinates.
  * 
- *  @author William Perryman
- *  @author Edwin Barrack
- *  @version 10/9/2025
+ * @author William Perryman
+ * @author Edwin Barrack
+ * @version 10/9/2025
  */
 public class kDTree {
     private BinaryNode<City> root;
@@ -239,21 +239,6 @@ public class kDTree {
      */
     public String debug() {
         return printPreOrder(root, 0, "");
-    }
-
-
-    /**
-     * Deletes the first instance of the parameterized coordinates.
-     * 
-     * @param x
-     *            - The X coordinate for possible deletion
-     * @param y
-     *            - The Y coordinate for possible deletion
-     * @return Name of the city deleted
-     */
-    public String deleteByCo(int x, int y) {
-
-        return "";
     }
 
 }
