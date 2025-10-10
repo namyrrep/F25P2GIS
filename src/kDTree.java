@@ -1,6 +1,10 @@
 /**
  * This class represents are kdTree, a binary tree that switches
  * between sorting by x and y coordinates.
+ * 
+ *  @author William Perryman
+ *  @author Edwin Barrack
+ *  @version 10/9/2025
  */
 public class kDTree {
     private BinaryNode<City> root;

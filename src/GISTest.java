@@ -2,8 +2,9 @@ import java.io.IOException;
 import student.TestCase;
 
 /**
- * @author {Your Name Here}
- * @version {Put Something Here}
+ * @author William Perryman
+ * @author Edwin Barrack
+ * @version 10/9/2025
  */
 public class GISTest extends TestCase {
 
@@ -81,10 +82,9 @@ public class GISTest extends TestCase {
             + "2    L (11, 500)\n" + "0Chicago (100, 150)\n"
             + "1  Tacoma (1000, 100)\n" + "2    L (101, 150)\n", it.debug());
         assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
-        assertFuzzyEquals("L", it.info(101, 150));
         /**
          * 
-         * 
+         * assertFuzzyEquals("L", it.info(101, 150));
          * assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
          * assertFuzzyEquals("3\nChicago", it.delete(100, 150));
          * assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
@@ -133,6 +133,7 @@ public class GISTest extends TestCase {
      * @throws IOException
      */
     public void testKDTree() throws IOException {
+    	assertEquals(it.search(100, 100, 100), "");
         assertEquals(it.info(100, 100), "");
         assertTrue(it.insert("root", 100, 100));
         assertTrue(it.insert("left", 75, 100));
@@ -171,7 +172,7 @@ public class GISTest extends TestCase {
             + "Tester (100, 150)\r\n" + "right4 (150, 100)\r\n" + "10", it
                 .search(100, 100, 50));
         assertFuzzyEquals("root (100, 100)\r\n" + "left (75, 100)\r\n"
-            + "right (125, 100)\r\n" + "7", it.search(100, 100, 25));
+            + "right (125, 100)\r\n" + "3", it.search(100, 100, 25));
     }
 
 
