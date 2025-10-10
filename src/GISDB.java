@@ -22,7 +22,7 @@ public class GISDB implements GIS {
     /**
      * This is the KD tree
      */
-    private kDTree kTree;
+    private KDTree kTree;
 
     /**
      * This is the Binary search tree
@@ -35,7 +35,7 @@ public class GISDB implements GIS {
      */
     public GISDB() {
         bTree = new BSTree<City>();
-        kTree = new kDTree();
+        kTree = new KDTree();
     }
 
 
@@ -47,7 +47,7 @@ public class GISDB implements GIS {
      */
     public boolean clear() {
         bTree = new BSTree<City>();
-        kTree = new kDTree();
+        kTree = new KDTree();
         return true;
     }
 
