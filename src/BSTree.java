@@ -108,16 +108,18 @@ public class BSTree<T extends Comparable<T>> {
 
 
     /**
-     * The delete function returns true for false depending on if the tree
-     * successfully deletes
-     * 
+     * Removes nodes based on the specified comparison type
+     *
      * @param target
-     *            is what we are looking to remove
-     * @return String that contains what is removed
+     *            the item to remove
+     * @param useEquals
+     *            true to use equals() for exact matching,
+     *            false to use compareTo() for natural ordering matching
+     * @return String containing what was removed
      */
-    public String removeNode(T target) {
+    public String removeNode(T target, boolean useEquals) {
         StringBuilder deleted = new StringBuilder();
-        root = removeHelp(root, target, deleted);
+        root = removeHelp(root, target, deleted, useEquals);
         return deleted.toString();
     }
 
@@ -125,48 +127,50 @@ public class BSTree<T extends Comparable<T>> {
     private BinaryNode<T> removeHelp(
         BinaryNode<T> base,
         T targ,
-        StringBuilder result) {
+        StringBuilder result,
+        boolean useEquals) {
 
         if (base == null) {
             return null;
         }
+
         int comparison = base.getData().compareTo(targ);
         if (comparison > 0) {
-            // Target is in left subtree
-            base.setLeft(removeHelp(base.getLeft(), targ, result));
+            base.setLeft(removeHelp(base.getLeft(), targ, result, useEquals));
         }
         else if (comparison < 0) {
-            // Target is in right subtree
-            base.setRight(removeHelp(base.getRight(), targ, result));
+            base.setRight(removeHelp(base.getRight(), targ, result, useEquals));
         }
         else {
-            // Found a match - add to result
-            result.append(base.getData().toString()).append("\n");
+            // Same compareTo result - check which comparison method to use
+            boolean shouldDelete = useEquals
+                ? base.getData().equals(targ)
+                : true;
 
-            // Handle node deletion based on children count
-            if (base.getLeft() == null) {
-                // Continue searching right subtree for duplicates before
-                return base.getRight();
-            }
-            else if (base.getRight() == null) {
-                // Continue searching left subtree for duplicates
-                base.setLeft(removeHelp(base.getLeft(), targ, result));
-                return base.getLeft();
-            }
-            else {
-                // Two children case - replace with predecessor
-                BinaryNode<T> predecessor = getMax(base.getLeft());
-                base.setData(predecessor.getData());
-                base.setLeft(deleteMax(base.getLeft()));
+            if (shouldDelete) {
+                // This node should be deleted
+                result.append(base.getData().toString()).append("\n");
 
-                // Continue searching both subtrees for duplicates
-                base.setLeft(removeHelp(base.getLeft(), targ, result));
-                base.setRight(removeHelp(base.getRight(), targ, result));
+                if (base.getLeft() == null) {
+                    return base.getRight();
+                }
+                else if (base.getRight() == null) {
+                    return base.getLeft();
+                }
+                else {
+                    // Two children case
+                    BinaryNode<T> predecessor = getMax(base.getLeft());
+                    base.setData(predecessor.getData());
+                    base.setLeft(deleteMax(base.getLeft()));
+                }
             }
+
+            // Continue searching both subtrees for more matches
+            base.setLeft(removeHelp(base.getLeft(), targ, result, useEquals));
+            base.setRight(removeHelp(base.getRight(), targ, result, useEquals));
         }
 
         return base;
-
     }
 
 

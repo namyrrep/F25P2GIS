@@ -123,7 +123,7 @@ public class GISDB implements GIS {
         // To pass into a BSTree it needs to be a city type, so I make a city to
         // pass through
         City delCity = new City(name, 0, 0);
-        String cities = bTree.removeNode(delCity);
+        String cities = bTree.removeNode(delCity, false);
 // if (cities.equals("")) {
 // return "";
 // }
