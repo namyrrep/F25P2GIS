@@ -113,7 +113,8 @@ public class GISDB implements GIS {
      *         (listed in preorder as they are deleted).
      */
     public String delete(String name) {
-        return "";
+        City ourCity = new City(name, 0, 0);
+        return bTree.removeNode(ourCity);
     }
 
 

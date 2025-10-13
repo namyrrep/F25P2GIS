@@ -66,3 +66,104 @@ Looking at your k-d tree search implementation, you want to track the number of 
     String cities = helpSearch(root, x, y, r, 0, visitCount);
     return cities + visitCount[0]; // Append count at the end
 }
+
+ /**
+     * The delete function returns true for false depending on if the tree
+     * successfully deletes
+     * 
+     * @param target
+     *            is what we are looking to remove
+     * @return String that contains what is removed
+     */
+    public String removeNode(T target) {
+        
+        return "";
+    }
+
+I want to create a remove function in my generic BST function, my teacher gave me some code but i need to probably change what was given a lot
+
+  // Remove a record from the tree
+  // key: The key value of record to remove
+  // Returns the record removed, null if there is none.
+  public Comparable remove(Comparable key) {
+    Comparable temp = findhelp(root, key); // First find it
+    if (temp != null) {
+      root = removehelp(root, key); // Now remove it
+      nodecount--;
+    }
+    return temp;
+  } 
+
+the remove function will correclate to the remove in GSDB and work directly with the remove(String name) method.
+
+Looking at your requirements, you need to adapt the teacher's code to work with your generic BSTree and 
+return a String of removed items.
+ Here's the implementation:
+ /**
+ * The delete function removes all nodes with the target value
+ * 
+ * @param target
+ *            is what we are looking to remove
+ * @return String that contains what is removed
+ */
+public String removeNode(T target) {
+    StringBuilder result = new StringBuilder();
+    root = removeHelper(root, target, result);
+    return result.toString();
+}
+
+private BinaryNode<T> removeHelper(BinaryNode<T> node, T target, StringBuilder result) {
+    if (node == null) {
+        return null;
+    }
+    
+    int comparison = node.getData().compareTo(target);
+    
+    if (comparison > 0) {
+        // Target is in left subtree
+        node.setLeft(removeHelper(node.getLeft(), target, result));
+    }
+    else if (comparison < 0) {
+        // Target is in right subtree
+        node.setRight(removeHelper(node.getRight(), target, result));
+    }
+    else {
+        // Found a match - add to result
+        result.append(node.getData().toString()).append("\n");
+        
+        // Continue searching left subtree for more matches
+        node.setLeft(removeHelper(node.getLeft(), target, result));
+        
+        // Remove this node
+        if (node.getLeft() == null) {
+            return node.getRight();
+        }
+        else if (node.getRight() == null) {
+            return node.getLeft();
+        }
+        else {
+            // Node has two children - find inorder successor
+            BinaryNode<T> successor = findMin(node.getRight());
+            node.setData(successor.getData());
+            node.setRight(deleteMin(node.getRight()));
+        }
+    }
+    
+    return node;
+}
+
+private BinaryNode<T> findMin(BinaryNode<T> node) {
+    while (node.getLeft() != null) {
+        node = node.getLeft();
+    }
+    return node;
+}
+
+private BinaryNode<T> deleteMin(BinaryNode<T> node) {
+    if (node.getLeft() == null) {
+        return node.getRight();
+    }
+    node.setLeft(deleteMin(node.getLeft()));
+    return node;
+}
+

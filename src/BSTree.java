@@ -105,4 +105,64 @@ public class BSTree<T extends Comparable<T>> {
 
         return cur;
     }
+
+
+    /**
+     * The delete function returns true for false depending on if the tree
+     * successfully deletes
+     * 
+     * @param target
+     *            is what we are looking to remove
+     * @return String that contains what is removed
+     */
+    public String removeNode(T target) {
+        StringBuilder deleted = new StringBuilder();
+        root = removeHelp(root, target, deleted);
+        return deleted.toString();
+    }
+
+
+    private BinaryNode<T> removeHelp(
+        BinaryNode<T> base,
+        T targ,
+        StringBuilder result) {
+
+        if (base == null)
+            return null;
+        if (base.getData().compareTo(targ) > 0) {
+            result.append(base.getData().toString() + "\n");
+            base.setLeft(removeHelp(base.getLeft(), targ, result));
+        }
+        else if (base.getData().compareTo(targ) < 0) {
+            result.append(base.getData().toString() + "\n");
+            base.setRight(removeHelp(base.getRight(), targ, result));
+        }
+        else {
+            if (base.getLeft() == null)
+                return base.getRight();
+            else if (base.getRight() == null)
+                return base.getLeft();
+            else {
+                BinaryNode<T> temp = getMax(base.getLeft());
+                base.setData(targ);
+                base.setLeft(deleteMax(base.getLeft()));
+            }
+        }
+        return base;
+    }
+
+
+    private BinaryNode<T> getMax(BinaryNode<T> input) {
+        while (input.getRight() != null)
+            input = input.getRight();
+        return input;
+    }
+
+
+    private BinaryNode<T> deleteMax(BinaryNode<T> input) {
+        if (input.getRight() == null)
+            return input.getRight();
+        input.setRight(deleteMax(input.getRight()));
+        return input;
+    }
 }
