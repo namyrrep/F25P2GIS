@@ -130,7 +130,7 @@ public class KDTree {
      */
     public String helpInfo(BinaryNode<City> node, int x, int y, int dimension) {
         // If the root is null, there are no City's in this tree.
-        if (root == null) {
+        if (node == null) {
             return "";
         }
 
