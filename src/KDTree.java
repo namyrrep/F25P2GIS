@@ -213,21 +213,21 @@ public class KDTree {
         // Check the dimension to see if we are checking the X or Y coordinate.
         if (dimension % 2 == 0) {
             // Go Left if x value is greater than distance r from x
-            if (node.getData().getXValue() > x - r) {
+            if (node.getData().getXValue() >= x - r) {
                 result += helpSearch(node.getLeft(), x, y, r, dimension + 1,
                     num);
             } // Go Right if x value is less than distance r from x
-            if (node.getData().getXValue() < x + r) {
+            if (node.getData().getXValue() <= x + r) {
                 result += helpSearch(node.getRight(), x, y, r, dimension + 1,
                     num);
             }
             return result;
         }
         // Go left if y value is greater than distance r from x
-        if (node.getData().getYValue() > y - r) {
+        if (node.getData().getYValue() >= y - r) {
             result += helpSearch(node.getLeft(), x, y, r, dimension + 1, num);
         } // Go right if y value is less than distance r from x
-        if (node.getData().getYValue() < y + r) {
+        if (node.getData().getYValue() <= y + r) {
             result += helpSearch(node.getRight(), x, y, r, dimension + 1, num);
         }
         return result;
