@@ -147,6 +147,67 @@ public class KDTree {
 
 
     /**
+     * This method returns true if point is within circle, false otherwise
+     * 
+     * @param node City 
+     * @param x Coordinate
+     * @param y Coordinate
+     * @param r Coordinate
+     * @return boolean
+     */
+    private boolean inCircle(BinaryNode<City> node, int x, int y, int r) {
+    	int xDiff = x - node.getData().getXValue();
+    	int yDiff = y - node.getData().getYValue();
+    	
+    	return (xDiff * xDiff) + (yDiff * yDiff) <= (r * r);
+    }
+
+    /**
+     * The helper method for the search method.
+     * 
+     * @param node of city
+     * @param x Coordinate
+     * @param y Coordinate
+     * @param r radius
+     * @param dimension
+     * @param num cities
+     * @return String List of City's and # of nodes visited
+     */
+    private String helpSearch(BinaryNode<City> node, int x, int y, int r, int dimension, int[] num) {
+        // Returns "" if node is null
+        if (node == null) {
+            return "";
+        }
+        num[0]++; // Node visited
+        String result = "";
+        // Add current value if it is in the circle.
+        if(inCircle(node, x, y, r)) {
+        	result += node.getData().toString();
+        }
+        
+        // Check the dimension to see if we are checking the X or Y coordinate.
+        if (dimension % 2 == 0) {
+            // Go Left if x value is greater than distance r from x
+            if (node.getData().getXValue() > x - r) {
+                result += helpSearch(node.getLeft(), x, y, r, dimension + 1, num);
+            } // Go Right if x value is less than distance r from x
+            if (node.getData().getXValue() < x + r) {
+            	result += helpSearch(node.getRight(), x, y, r, dimension + 1, num);
+            }
+            return result;
+        }
+        // Go left if y value is greater than distance r from x
+        if (node.getData().getYValue() > y - r) {
+            result += helpSearch(node.getLeft(), x, y, r, dimension + 1, num);
+        } // Go right if y value is less than distance r from x
+        if (node.getData().getYValue() < y + r) {
+        	result += helpSearch(node.getRight(), x, y, r, dimension + 1, num);
+        }
+        return result;
+
+    }
+    
+    /**
      * Returns a list of City's in the radius r away from the location (x, y).
      * 
      * @param x Coordinate
@@ -156,48 +217,7 @@ public class KDTree {
      */
     public String search(int x, int y, int r) {
         int[] count = { 0 };
-        return helpSearch(root, x, y, r, count) + count[0];
-    }
-
-
-    /**
-     * The helper method for the search method.
-     * 
-     * @param node of city
-     * @param x Coordinate
-     * @param y Coordinate
-     * @param r radius
-     * @param num cities
-     * @return String List of City's and # of nodes visited
-     */
-    private String helpSearch(
-        BinaryNode<City> node,
-        int x,
-        int y,
-        int r,
-        int[] num) {
-        // If root is null, there are no City's in radius.
-        if (root == null) {
-            return "";
-        }
-        // Returns "" if node is null
-        if (node == null) {
-            return "";
-        }
-        String result = "";
-        // Calculate using the function for a circle.
-        double distance = (Math.pow(r, 2) - Math.pow((x - node.getData()
-            .getXValue()), 2)) - Math.pow((y - node.getData().getYValue()), 2);
-
-        // Do both children
-        if (distance >= 0) {
-            result += node.getData().toString() + "\n";
-            num[0]++;
-            result += helpSearch(node.getLeft(), x, y, r, num);
-            result += helpSearch(node.getRight(), x, y, r, num);
-        }
-        // No children otherwise.
-        return result;
+        return helpSearch(root, x, y, r, 0, count) + count[0];
     }
 
 
