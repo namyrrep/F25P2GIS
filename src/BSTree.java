@@ -142,32 +142,34 @@ public class BSTree<T extends Comparable<T>> {
             base.setRight(removeHelp(base.getRight(), targ, result, useEquals));
         }
         else {
-            // Same compareTo result - check which comparison method to use
             boolean shouldDelete = useEquals
                 ? base.getData().equals(targ)
                 : true;
 
             if (shouldDelete) {
-                // This node should be deleted
                 result.append(base.getData().toString()).append("\n");
 
                 if (base.getLeft() == null) {
-                    return base.getRight();
+                    return removeHelp(base.getRight(), targ, result, useEquals);
                 }
                 else if (base.getRight() == null) {
-                    return base.getLeft();
+                    return removeHelp(base.getLeft(), targ, result, useEquals);
                 }
                 else {
-                    // Two children case
                     BinaryNode<T> predecessor = getMax(base.getLeft());
                     base.setData(predecessor.getData());
                     base.setLeft(deleteMax(base.getLeft()));
+                    // After replacement, continue searching the current node
+                    // again
+                    return removeHelp(base, targ, result, useEquals);
                 }
             }
-
-            // Continue searching both subtrees for more matches
-            base.setLeft(removeHelp(base.getLeft(), targ, result, useEquals));
-            base.setRight(removeHelp(base.getRight(), targ, result, useEquals));
+            else {
+                base.setLeft(removeHelp(base.getLeft(), targ, result,
+                    useEquals));
+                base.setRight(removeHelp(base.getRight(), targ, result,
+                    useEquals));
+            }
         }
 
         return base;
