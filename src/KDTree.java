@@ -177,6 +177,23 @@ public class KDTree {
 
 
     /**
+     * Returns a list of City's in the radius r away from the location (x, y).
+     * 
+     * @param x
+     *            Coordinate
+     * @param y
+     *            Coordinate
+     * @param r
+     *            radius
+     * @return String List of City's and # of nodes visited
+     */
+    public String search(int x, int y, int r) {
+        int[] count = { 0 };
+        return helpSearch(root, x, y, r, 0, count) + count[0];
+    }
+
+
+    /**
      * The helper method for the search method.
      * 
      * @param node
@@ -236,23 +253,6 @@ public class KDTree {
 
 
     /**
-     * Returns a list of City's in the radius r away from the location (x, y).
-     * 
-     * @param x
-     *            Coordinate
-     * @param y
-     *            Coordinate
-     * @param r
-     *            radius
-     * @return String List of City's and # of nodes visited
-     */
-    public String search(int x, int y, int r) {
-        int[] count = { 0 };
-        return helpSearch(root, x, y, r, 0, count) + count[0];
-    }
-
-
-    /**
      * Returns the tree printed out in pre-order format
      * 
      * @param node
@@ -295,113 +295,150 @@ public class KDTree {
         return printPreOrder(root, 0, "");
     }
 
+
     /**
      * Helps find the min node
      * 
-     * @param node City
-     * @param descrim Dimension Comparison
-     * @param dimension Actual Dimension
+     * @param node
+     *            City
+     * @param descrim
+     *            Dimension Comparison
+     * @param dimension
+     *            Actual Dimension
      * @return BinaryNode<City>
      */
-    private BinaryNode<City> findMin(BinaryNode<City> node, int descrim, int dimension) {
-    	BinaryNode<City> temp1, temp2;
-    	int x1 = 0;
-    	int y1 = 0;
-    	int x2 = 0;
-    	int y2 = 0;
-    	if (node == null) {
-    		return null;
-    	}
-    	// Gets the minimum descrim value from left branch.
-    	temp1 = findMin(node.getLeft(), descrim, dimension + 1);
-    	if (temp1 != null) {
-    		x1 = temp1.getData().getXValue();
-    		y1 = temp1.getData().getYValue();
-    	}
-    	// Must check right branch if ordered by opposite dimension
-    	if (descrim % 2 != dimension % 2) {
-    		// Gets the minimum descrim value from right branch.
-    		temp2 = findMin(node.getRight(), descrim, dimension + 1);
-    		if (temp2 != null) {
-    			x2 = temp2.getData().getXValue();
-    			y2 = temp2.getData().getYValue();
-    		}
-    		// Condition for one or two child node
-    		if ((temp1 == null) || (temp2 != null && 
-    				((descrim % 2 == 0 && x1 > x2) || 
-    				(descrim % 2 == 1 && y1 > y2)))) {
-    			temp1 = temp2;
-    			x1 = x2;
-    			y1 = y2;
-    		}
-    	}
-    	// Compares the smallest found node to the parent node.
-    	int x3 = node.getData().getXValue();
-    	int y3 = node.getData().getYValue();
-    	if ((temp1 == null) || ((descrim % 2 == 0 && x1 > x3) || 
-    			(descrim % 2 == 1 && y1 > y3))) {
-    		return node;
-    	}
-    	return temp1;
+    private BinaryNode<City> findMin(
+        BinaryNode<City> node,
+        int descrim,
+        int dimension) {
+        BinaryNode<City> temp1, temp2;
+        int x1 = 0;
+        int y1 = 0;
+        int x2 = 0;
+        int y2 = 0;
+        if (node == null) {
+            return null;
+        }
+        // Gets the minimum descrim value from left branch.
+        temp1 = findMin(node.getLeft(), descrim, dimension + 1);
+        if (temp1 != null) {
+            x1 = temp1.getData().getXValue();
+            y1 = temp1.getData().getYValue();
+        }
+        // Must check right branch if ordered by opposite dimension
+        if (descrim % 2 != dimension % 2) {
+            // Gets the minimum descrim value from right branch.
+            temp2 = findMin(node.getRight(), descrim, dimension + 1);
+            if (temp2 != null) {
+                x2 = temp2.getData().getXValue();
+                y2 = temp2.getData().getYValue();
+            }
+            // Condition for one or two child node
+            if ((temp1 == null) || (temp2 != null && ((descrim % 2 == 0
+                && x1 > x2) || (descrim % 2 == 1 && y1 > y2)))) {
+                temp1 = temp2;
+                x1 = x2;
+                y1 = y2;
+            }
+        }
+        // Compares the smallest found node to the parent node.
+        int x3 = node.getData().getXValue();
+        int y3 = node.getData().getYValue();
+        if ((temp1 == null) || ((descrim % 2 == 0 && x1 > x3) || (descrim
+            % 2 == 1 && y1 > y3))) {
+            return node;
+        }
+        return temp1;
     }
-    
+
+
     /**
      * Removes a node given the X and Y coordinates
      * 
-     * @param node The root and recursive nodes
-     * @param x Coordinate
-     * @param y Coordinate
+     * @param node
+     *            The root and recursive nodes
+     * @param x
+     *            Coordinate
+     * @param y
+     *            Coordinate
      * @param dimension
-     * @return boolean
+     * @param sb
+     *            StringBuilder to store city name
+     * @param nodesVisited
+     *            Counter for nodes visited
+     * @return BinaryNode after removal
      */
-    private BinaryNode<City> helpRemove(BinaryNode<City> node, int x, int y, int dimension) {
-    	// If there is nothing to remove.
-    	if (node == null) {
-    		return null;
-    	}
-    	
-    	// Found node to delete.
-    	if (node.getData().getXValue() == x &&
-    			node.getData().getYValue() == y) {
-    		// If there is a right subtree
-    		if (node.getRight() != null) {
-    			BinaryNode<City> minNode = findMin(node.getRight(), dimension, dimension + 1);
-    			node.setData(minNode.getData());
-    			node.setRight(helpRemove(node.getRight(), minNode.getData().getXValue(), 
-    					minNode.getData().getYValue(), dimension + 1));
-    		} // If there is a left subtree, but not a right.
-    		else if (node.getLeft() != null) {
-    			BinaryNode<City> minNode = findMin(node.getLeft(), dimension, dimension + 1);
-    			node.setData(minNode.getData());
-    			node.setRight(helpRemove(node.getLeft(), minNode.getData().getXValue(), 
-    					minNode.getData().getYValue(), dimension + 1));
-    			node.setLeft(null);
-    		} // If there is no tree
-    		else {
-    			return null;
-    		}
-    		return node;
-    	}
-    	// If the node has not been found.
-    	if ((dimension % 2 == 0 && x < node.getData().getXValue()) ||
-    			(dimension % 2 == 1 && y < node.getData().getYValue())) {
-    		node.setLeft(helpRemove(node.getLeft(), x, y, dimension + 1));
-    	}
-    	else {
-    		node.setRight(helpRemove(node.getRight(), x, y, dimension + 1));
-    	}
-    	return node;
+    private BinaryNode<City> helpRemove(
+        BinaryNode<City> node,
+        int x,
+        int y,
+        int dimension,
+        StringBuilder sb,
+        int[] nodesVisited) {
+        // If there is nothing to remove.
+        if (node == null) {
+            return null;
+        }
+        
+        nodesVisited[0]++;
+
+        // Found node to delete.
+        if (node.getData().getXValue() == x && node.getData()
+            .getYValue() == y) {
+            // Append deleted city name to StringBuilder
+            sb.append(node.getData().getCityName());
+            // If there is a right subtree
+            if (node.getRight() != null) {
+                BinaryNode<City> minNode = findMin(node.getRight(), dimension,
+                    dimension + 1);
+                node.setData(minNode.getData());
+                node.setRight(helpRemove(node.getRight(), minNode.getData()
+                    .getXValue(), minNode.getData().getYValue(), dimension + 1,
+                    sb, nodesVisited));
+            } // If there is a left subtree, but not a right.
+            else if (node.getLeft() != null) {
+                BinaryNode<City> minNode = findMin(node.getLeft(), dimension,
+                    dimension + 1);
+                node.setData(minNode.getData());
+                node.setRight(helpRemove(node.getLeft(), minNode.getData()
+                    .getXValue(), minNode.getData().getYValue(), dimension + 1,
+                    sb, nodesVisited));
+                node.setLeft(null);
+            } // If there is no tree
+            else {
+                return null;
+            }
+            return node;
+        }
+        // If the node has not been found.
+        if ((dimension % 2 == 0 && x < node.getData().getXValue()) || (dimension
+            % 2 == 1 && y < node.getData().getYValue())) {
+            node.setLeft(helpRemove(node.getLeft(), x, y, dimension + 1, sb, nodesVisited));
+        }
+        else {
+            node.setRight(helpRemove(node.getRight(), x, y, dimension + 1, sb, nodesVisited));
+        }
+        return node;
     }
-    
+
+
     /**
      * Provides the template for the helpRemove() method.
      * 
-     * @param x Coordinate
-     * @param y Coordinate
-     * @return boolean
+     * @param x
+     *            Coordinate
+     * @param y
+     *            Coordinate
+     * @return String with node count and city name
      */
-    public boolean delete(int x, int y) {
-    	return helpRemove(root, x, y, 0) == null;
+    public String delete(int x, int y) {
+        StringBuilder cityName = new StringBuilder();
+        int[] nodesVisited = { 0 };
+        root = helpRemove(root, x, y, 0, cityName, nodesVisited);
+        if (cityName.length() == 0) {
+            return "";
+        }
+        return nodesVisited[0] + "\n" + cityName.toString();
     }
 
 }

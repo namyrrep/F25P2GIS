@@ -95,13 +95,17 @@ public class GISDB implements GIS {
      *         deletion process, followed by the name of the city.
      */
     public String delete(int x, int y) {
-// String cityName = kTree.info(x, y);
-// if (cityName.equals("")) {
-// return "";
-// }
-// City delCity = new City(cityName, x, y);
-// bTree.delete(delCity);
-// return kTree.delete(x, y);
+        String result = kTree.delete(x, y);
+        if (!result.equals("")) {
+            // Split result into node count and city name
+            String[] parts = result.split("\n", 2);
+            String cityName = parts.length > 1 ? parts[1] : "";
+            if (!cityName.equals("")) {
+                City delCity = new City(cityName, x, y);
+                bTree.removeNode(delCity, true);
+            }
+            return result;
+        }
         return "";
     }
 
@@ -124,10 +128,20 @@ public class GISDB implements GIS {
         // pass through
         City delCity = new City(name, 0, 0);
         String cities = bTree.removeNode(delCity, false);
-        if(cities.equals(""))
+        if (cities.equals(""))
             return "";
-                
+        // Now need to delete from kTree
+        String[] cityList = cities.split("\n");
+        for (String cityInfo : cityList) {
+            String[] parts = cityInfo.split(" ");
+            String xStr = parts[1].replaceAll("[^\\d]", "");
+            String yStr = parts[2].replaceAll("[^\\d]", "");
+            int x = Integer.parseInt(xStr);
+            int y = Integer.parseInt(yStr);
+            kTree.delete(x, y);
+        }
         return cities;
+
     }
 
 

@@ -83,19 +83,12 @@ public class GISTest extends TestCase {
             + "1  Tacoma (1000, 100)\n" + "2    L (101, 150)\n", it.debug());
         assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
         assertFuzzyEquals("L", it.info(101, 150));
-        // assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
-        it.clear();
-
-        /**
-         * 
-         * 
-         * 
-         * assertFuzzyEquals("3\nChicago", it.delete(100, 150));
-         * assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
-         * + "Baltimore (0, 300)\n" + "Washington (5, 350)\n"
-         * + "L (11, 500)\n5", it.search(0, 0, 2000));
-         * assertFuzzyEquals("Baltimore (0, 300)\n4", it.search(0, 300, 0))
-         */
+        assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
+        // assertFuzzyEquals("3\nChicago", it.delete(100, 150));
+        // assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
+        // + "Baltimore (0, 300)\n" + "Washington (5, 350)\n"
+        // + "L (11, 500)\n5", it.search(0, 0, 2000));
+        // assertFuzzyEquals("Baltimore (0, 300)\n4", it.search(0, 300, 0));
     }
 
 
@@ -259,5 +252,178 @@ public class GISTest extends TestCase {
         // because the max path is C -> K -> L (L is max, but K has right child)
         String resultb = it.delete("F");
         assertTrue(resultb.contains("F"));
+
+        // Test case: Remove node with only left child
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("Left", 50, 50));
+        assertTrue(it.insert("LeftLeft", 25, 25));
+        // Left has only a left child (LeftLeft)
+        assertFuzzyEquals("Left (50, 50)\n", it.delete("Left"));
+        assertEquals("", it.info("Left"));
+        assertFuzzyEquals("LeftLeft (25, 25)", it.info("LeftLeft"));
+
+        // Test case: Remove node with only right child (covers base.getLeft()
+        // == null path)
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("Right", 150, 150));
+        assertTrue(it.insert("RightRight", 175, 175));
+        // Right has only a right child (RightRight)
+        assertFuzzyEquals("Right (150, 150)\n", it.delete("Right"));
+        assertEquals("", it.info("Right"));
+        assertFuzzyEquals("RightRight (175, 175)", it.info("RightRight"));
+
+        // Test case: useEquals=true with matching equals
+        it.clear();
+        City cityA = new City("TestCity", 100, 100);
+        City cityB = new City("TestCity", 100, 100); // Same name and
+                                                     // coordinates
+        BSTree<City> bst = new BSTree<City>();
+        bst.insert(cityA);
+        String deleteResult = bst.removeNode(cityB, true);
+        assertTrue(deleteResult.contains("TestCity"));
+
+        // Test case: useEquals=true with non-matching equals
+        // (shouldDelete=false path)
+        it.clear();
+        assertTrue(it.insert("Same", 100, 100));
+        assertTrue(it.insert("Same", 50, 50));
+        assertTrue(it.insert("Same", 150, 150));
+        assertTrue(it.insert("Different", 75, 75));
+        // When using equals with City, it compares name AND coordinates
+        // So searching for "Same" at (100, 100) should only delete that exact
+        // one
+        City targetCity = new City("Same", 100, 100);
+        BSTree<City> bst2 = new BSTree<City>();
+        bst2.insert(new City("Same", 100, 100));
+        bst2.insert(new City("Same", 50, 50));
+        bst2.insert(new City("Same", 150, 150));
+        String result2 = bst2.removeNode(targetCity, true);
+        // Should remove the matching city
+        assertTrue(result2.contains("Same (100, 100)"));
+
+        // Test case: deleteMax with node having left child (input.getRight() ==
+        // null path)
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("Left", 50, 50));
+        assertTrue(it.insert("LeftLeft", 25, 25));
+        assertTrue(it.insert("LeftRight", 75, 75));
+        assertTrue(it.insert("LeftRightLeft", 60, 60));
+        // When we delete Left, deleteMax will find LeftRight (max of left
+        // subtree)
+        // LeftRight has a left child (LeftRightLeft), so deleteMax returns
+        // input.getLeft()
+        assertFuzzyEquals("Left (50, 50)\n", it.delete("Left"));
+
+        // Test case: getMax and deleteMax with deep right chain
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("A", 50, 50));
+        assertTrue(it.insert("B", 60, 60));
+        assertTrue(it.insert("C", 70, 70));
+        assertTrue(it.insert("D", 80, 80));
+        // Deleting Root will use getMax to find D (rightmost of left subtree)
+        assertFuzzyEquals("Root (100, 100)\n", it.delete("Root"));
+        assertFuzzyEquals("D (80, 80)", it.info("D"));
+
+        // Test case: Remove from empty subtree (base == null path)
+        it.clear();
+        assertTrue(it.insert("OnlyRoot", 100, 100));
+        String emptyDelete = it.delete("NonExistent");
+        assertEquals("", emptyDelete);
+
+        // Test case: comparison > 0 (search left subtree)
+        it.clear();
+        assertTrue(it.insert("M", 100, 100));
+        assertTrue(it.insert("Z", 200, 200));
+        assertTrue(it.insert("A", 50, 50));
+        // Deleting "A" requires going left from "M"
+        assertFuzzyEquals("A (50, 50)\n", it.delete("A"));
+
+        // Test case: comparison < 0 (search right subtree)
+        it.clear();
+        assertTrue(it.insert("M", 100, 100));
+        assertTrue(it.insert("A", 50, 50));
+        assertTrue(it.insert("Z", 200, 200));
+        // Deleting "Z" requires going right from "M"
+        assertFuzzyEquals("Z (200, 200)\n", it.delete("Z"));
+
+        // Additional tests to ensure getMax and deleteMax coverage
+
+        // Test case: Direct call to ensure getMax iterates through multiple
+        // right nodes
+        it.clear();
+        BSTree<City> bstDirect = new BSTree<City>();
+        bstDirect.insert(new City("A", 10, 10));
+        bstDirect.insert(new City("B", 20, 20));
+        bstDirect.insert(new City("C", 30, 30));
+        bstDirect.insert(new City("D", 40, 40));
+        // Delete "A" which has a right subtree B->C->D
+        // This calls getMax(A.left=null), so it goes to A.right subtree
+        // Actually, let's delete B which has left child and forces getMax to
+        // traverse
+        String res = bstDirect.removeNode(new City("B", 20, 20), false);
+        assertTrue(res.contains("B"));
+
+        // Test case: Ensure deleteMax recursive path is hit
+        it.clear();
+        assertTrue(it.insert("Root", 50, 50));
+        assertTrue(it.insert("Left", 25, 25));
+        assertTrue(it.insert("L1", 10, 10));
+        assertTrue(it.insert("L2", 20, 20));
+        assertTrue(it.insert("L3", 22, 22));
+        // Delete "Left" - it has left subtree L1->L2->L3
+        // getMax(Left.left) will traverse to L3 (rightmost)
+        // deleteMax will recursively delete through the right chain
+        String delResult = it.delete("Left");
+        assertTrue(delResult.contains("Left"));
+
+        // Test case: Node with two children where left subtree has deep right
+        // chain
+        it.clear();
+        BSTree<City> bst3 = new BSTree<City>();
+        bst3.insert(new City("M", 50, 50)); // Root
+        bst3.insert(new City("D", 20, 20)); // Left child
+        bst3.insert(new City("Z", 80, 80)); // Right child
+        bst3.insert(new City("A", 10, 10)); // D's left
+        bst3.insert(new City("H", 40, 40)); // D's right
+        bst3.insert(new City("F", 30, 30)); // H's left
+        bst3.insert(new City("I", 45, 45)); // H's right (this is the max of D's
+                                            // subtree)
+        // Now delete "M" - it will call getMax(D) which should traverse D->H->I
+        // and deleteMax(D) which should recursively remove I from the chain
+        String result3 = bst3.removeNode(new City("M", 50, 50), false);
+        assertTrue(result3.contains("M"));
+
+        // Test case: Ensure deleteMax hits the "return input.getLeft()" path
+        it.clear();
+        BSTree<City> bst4 = new BSTree<City>();
+        bst4.insert(new City("Root", 50, 50));
+        bst4.insert(new City("L", 30, 30));
+        bst4.insert(new City("R", 70, 70));
+        bst4.insert(new City("LL", 20, 20));
+        bst4.insert(new City("LR", 40, 40));
+        bst4.insert(new City("LRL", 35, 35)); // LR has only left child
+        // Delete "Root" - getMax(L) finds LR, deleteMax must handle LR having
+        // only left child
+        String result4 = bst4.removeNode(new City("Root", 50, 50), false);
+        assertTrue(result4.contains("Root"));
+
+        // Test case: Delete node where predecessor has no left child
+        it.clear();
+        BSTree<City> bst5 = new BSTree<City>();
+        bst5.insert(new City("M", 50, 50));
+        bst5.insert(new City("B", 20, 20));
+        bst5.insert(new City("Z", 80, 80));
+        bst5.insert(new City("A", 10, 10));
+        bst5.insert(new City("D", 30, 30));
+        // B's right child D is the max of B's left subtree, and D has no right
+        // child
+        // Delete M triggers getMax(B) = D, deleteMax should return
+        // D.getLeft()=null
+        String result5 = bst5.removeNode(new City("M", 50, 50), false);
+        assertTrue(result5.contains("M"));
     }
 }
