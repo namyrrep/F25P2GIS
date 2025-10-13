@@ -95,13 +95,14 @@ public class GISDB implements GIS {
      *         deletion process, followed by the name of the city.
      */
     public String delete(int x, int y) {
-        String cityName = kTree.info(x, y);
-        if (cityName.equals("")) {
-            return "";
-        }
-        City delCity = new City(cityName, x, y);
-        bTree.delete(delCity);
-        return kTree.delete(x, y);
+// String cityName = kTree.info(x, y);
+// if (cityName.equals("")) {
+// return "";
+// }
+// City delCity = new City(cityName, x, y);
+// bTree.delete(delCity);
+// return kTree.delete(x, y);
+        return "";
     }
 
 
@@ -122,21 +123,22 @@ public class GISDB implements GIS {
         // To pass into a BSTree it needs to be a city type, so I make a city to
         // pass through
         City delCity = new City(name, 0, 0);
-        String cities = bTree.findNode(delCity);
-        if (cities.equals("")) {
-            return "";
-        }
-        String[] cityList = cities.split("\n");
-        String result = "";
-        for (String cityInfo : cityList) {
-            String[] parts = cityInfo.split(" ");
-            int x = Integer.parseInt(parts[1]);
-            int y = Integer.parseInt(parts[2]);
-            result += kTree.delete(x, y) + "\n";
-            City removeCity = new City(name, x, y);
-            bTree.delete(removeCity);
-        }
-        return result.trim();
+        String cities = bTree.removeNode(delCity);
+// if (cities.equals("")) {
+// return "";
+// }
+// String[] cityList = cities.split("\n");
+// String result = "";
+// for (String cityInfo : cityList) {
+// String[] parts = cityInfo.split(" ");
+// int x = Integer.parseInt(parts[1]);
+// int y = Integer.parseInt(parts[2]);
+// result += kTree.delete(x, y) + "\n";
+// City removeCity = new City(name, x, y);
+// bTree.delete(removeCity);
+// }
+// return result.trim();
+        return cities;
     }
 
 

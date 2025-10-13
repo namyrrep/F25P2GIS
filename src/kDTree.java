@@ -20,7 +20,8 @@ public class KDTree {
     /**
      * Sets the current root to the given parameter
      * 
-     * @param BinaryNode<City> city Used
+     * @param BinaryNode<City>
+     *            city Used
      */
     public void setRoot(BinaryNode<City> city) {
         root = city;
@@ -30,7 +31,8 @@ public class KDTree {
     /**
      * Insert function to add to the tree
      * 
-     * @param city Used
+     * @param city
+     *            Used
      * @return boolean if successfully inserted
      */
     private boolean helpInsert(
@@ -90,7 +92,8 @@ public class KDTree {
     /**
      * This inserts using the helpInsert method
      * 
-     * @param city Used
+     * @param city
+     *            Used
      * @return boolean
      */
     public boolean insert(City city) {
@@ -101,8 +104,10 @@ public class KDTree {
     /**
      * Returns the City at (x, y) if possible
      * 
-     * @param x Coordinate
-     * @param y Coordinate
+     * @param x
+     *            Coordinate
+     * @param y
+     *            Coordinate
      * @return String Name of City
      */
     public String info(int x, int y) {
@@ -113,10 +118,14 @@ public class KDTree {
     /**
      * This is the helper method for info
      * 
-     * @param node City
-     * @param x Coordinate
-     * @param y Coordinate
-     * @param dimension of tree
+     * @param node
+     *            City
+     * @param x
+     *            Coordinate
+     * @param y
+     *            Coordinate
+     * @param dimension
+     *            of tree
      * @return String Name of City
      */
     public String helpInfo(BinaryNode<City> node, int x, int y, int dimension) {
@@ -149,31 +158,47 @@ public class KDTree {
     /**
      * This method returns true if point is within circle, false otherwise
      * 
-     * @param node City 
-     * @param x Coordinate
-     * @param y Coordinate
-     * @param r Coordinate
+     * @param node
+     *            City
+     * @param x
+     *            Coordinate
+     * @param y
+     *            Coordinate
+     * @param r
+     *            Coordinate
      * @return boolean
      */
     private boolean inCircle(BinaryNode<City> node, int x, int y, int r) {
-    	int xDiff = x - node.getData().getXValue();
-    	int yDiff = y - node.getData().getYValue();
-    	
-    	return (xDiff * xDiff) + (yDiff * yDiff) <= (r * r);
+        int xDiff = x - node.getData().getXValue();
+        int yDiff = y - node.getData().getYValue();
+
+        return (xDiff * xDiff) + (yDiff * yDiff) <= (r * r);
     }
+
 
     /**
      * The helper method for the search method.
      * 
-     * @param node of city
-     * @param x Coordinate
-     * @param y Coordinate
-     * @param r radius
+     * @param node
+     *            of city
+     * @param x
+     *            Coordinate
+     * @param y
+     *            Coordinate
+     * @param r
+     *            radius
      * @param dimension
-     * @param num cities
+     * @param num
+     *            cities
      * @return String List of City's and # of nodes visited
      */
-    private String helpSearch(BinaryNode<City> node, int x, int y, int r, int dimension, int[] num) {
+    private String helpSearch(
+        BinaryNode<City> node,
+        int x,
+        int y,
+        int r,
+        int dimension,
+        int[] num) {
         // Returns "" if node is null
         if (node == null) {
             return "";
@@ -181,18 +206,20 @@ public class KDTree {
         num[0]++; // Node visited
         String result = "";
         // Add current value if it is in the circle.
-        if(inCircle(node, x, y, r)) {
-        	result += node.getData().toString();
+        if (inCircle(node, x, y, r)) {
+            result += node.getData().toString() + "\n";
         }
-        
+
         // Check the dimension to see if we are checking the X or Y coordinate.
         if (dimension % 2 == 0) {
             // Go Left if x value is greater than distance r from x
             if (node.getData().getXValue() > x - r) {
-                result += helpSearch(node.getLeft(), x, y, r, dimension + 1, num);
+                result += helpSearch(node.getLeft(), x, y, r, dimension + 1,
+                    num);
             } // Go Right if x value is less than distance r from x
             if (node.getData().getXValue() < x + r) {
-            	result += helpSearch(node.getRight(), x, y, r, dimension + 1, num);
+                result += helpSearch(node.getRight(), x, y, r, dimension + 1,
+                    num);
             }
             return result;
         }
@@ -201,18 +228,22 @@ public class KDTree {
             result += helpSearch(node.getLeft(), x, y, r, dimension + 1, num);
         } // Go right if y value is less than distance r from x
         if (node.getData().getYValue() < y + r) {
-        	result += helpSearch(node.getRight(), x, y, r, dimension + 1, num);
+            result += helpSearch(node.getRight(), x, y, r, dimension + 1, num);
         }
         return result;
 
     }
-    
+
+
     /**
      * Returns a list of City's in the radius r away from the location (x, y).
      * 
-     * @param x Coordinate
-     * @param y Coordinate
-     * @param r radius
+     * @param x
+     *            Coordinate
+     * @param y
+     *            Coordinate
+     * @param r
+     *            radius
      * @return String List of City's and # of nodes visited
      */
     public String search(int x, int y, int r) {
@@ -224,9 +255,12 @@ public class KDTree {
     /**
      * Returns the tree printed out in pre-order format
      * 
-     * @param node of city
-     * @param dimension of tree
-     * @param spaces added
+     * @param node
+     *            of city
+     * @param dimension
+     *            of tree
+     * @param spaces
+     *            added
      * @return String of the tree
      */
     private String printPreOrder(
