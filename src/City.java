@@ -52,17 +52,6 @@ public class City implements Comparable<City> {
 
 
     /**
-     * This is the setter method for cityName field.
-     * 
-     * @param newName
-     *            is the new name of the city
-     */
-    public void setCityName(String newName) {
-        cityName = newName;
-    }
-
-
-    /**
      * This is the getter method for xValue field.
      * 
      * @return int the current x value

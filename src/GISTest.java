@@ -82,6 +82,9 @@ public class GISTest extends TestCase {
             + "2    L (11, 500)\n" + "0Chicago (100, 150)\n"
             + "1  Tacoma (1000, 100)\n" + "2    L (101, 150)\n", it.debug());
         assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
+
+        it.clear();
+
         /**
          * 
          * assertFuzzyEquals("L", it.info(101, 150));
@@ -103,10 +106,7 @@ public class GISTest extends TestCase {
     public void testCity() throws IOException {
         City myCity = new City("Hi", 1, 1);
         City otherCity = new City("Hi", 2, 2);
-
-        assertEquals(myCity.getCityName(), "Hi");
-        myCity.setCityName("Richmond");
-        assertEquals(myCity.getCityName(), "Richmond");
+        myCity = new City("Richmond", 1, 1);
 
         myCity.setXValue(2);
         assertEquals(myCity.getXValue(), 2);
@@ -117,7 +117,7 @@ public class GISTest extends TestCase {
         assertFalse(myCity.equals(null));
         assertFalse(myCity.equals(it));
         assertFalse(myCity.equals(otherCity));
-        otherCity.setCityName("Richmond");
+        otherCity = new City("Richmond", 2, 2);
         assertTrue(myCity.equals(otherCity));
         otherCity.setXValue(1);
         assertFalse(myCity.equals(otherCity));

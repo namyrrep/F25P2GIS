@@ -22,9 +22,8 @@ public class BSTree<T extends Comparable<T>> {
      * Inserts a value by passing it through to insert help a recursive
      * function from there it checks which way it should go by comparing
      * 
-     * @param input
+     * @param e
      *            is the value given
-     * @return boolean if correctly inserted
      */
     public void insert(T e) {
         root = insertHelp(root, e);
@@ -57,7 +56,7 @@ public class BSTree<T extends Comparable<T>> {
     /**
      * Finds the node given T input
      * 
-     * @param T
+     * @param input
      *            from whatever data type is passed in
      * @return String depending on if a node is found or not
      */
