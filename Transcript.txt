@@ -167,3 +167,77 @@ private BinaryNode<T> deleteMin(BinaryNode<T> node) {
     return node;
 }
 
+now give me test cases not a lot but just enough for full coverage of bstree delete
+/**
+ * Test BSTree removeNode - single node removal
+ */
+public void testRemoveSingleNode() throws IOException {
+    assertTrue(it.insert("SingleCity", 100, 100));
+    assertFuzzyEquals("SingleCity (100, 100)\n", it.delete("SingleCity"));
+    assertEquals("", it.info("SingleCity")); // Verify removal
+}
+
+/**
+ * Test BSTree removeNode - multiple nodes with same name
+ */
+public void testRemoveMultipleNodes() throws IOException {
+    assertTrue(it.insert("Duplicate", 50, 50));
+    assertTrue(it.insert("Duplicate", 75, 75));
+    assertTrue(it.insert("Duplicate", 25, 25));
+    String result = it.delete("Duplicate");
+    // Should remove all three cities with name "Duplicate"
+    assertTrue(result.contains("Duplicate (50, 50)"));
+    assertTrue(result.contains("Duplicate (75, 75)"));
+    assertTrue(result.contains("Duplicate (25, 25)"));
+    assertEquals("", it.info("Duplicate")); // All removed
+}
+
+/**
+ * Test BSTree removeNode - node with no children (leaf)
+ */
+public void testRemoveLeafNode() throws IOException {
+    assertTrue(it.insert("Root", 100, 100));
+    assertTrue(it.insert("Leaf", 150, 150));
+    assertFuzzyEquals("Leaf (150, 150)\n", it.delete("Leaf"));
+    assertEquals("", it.info("Leaf"));
+    assertFuzzyEquals("Root", it.info("Root")); // Root still exists
+}
+
+/**
+ * Test BSTree removeNode - node with one child
+ */
+public void testRemoveNodeOneChild() throws IOException {
+    assertTrue(it.insert("Middle", 100, 100));
+    assertTrue(it.insert("Child", 150, 150));
+    assertTrue(it.insert("Grandchild", 200, 200));
+    assertFuzzyEquals("Child (150, 150)\n", it.delete("Child"));
+    assertEquals("", it.info("Child"));
+    assertFuzzyEquals("Grandchild", it.info("Grandchild")); // Still accessible
+}
+
+/**
+ * Test BSTree removeNode - node with two children
+ */
+public void testRemoveNodeTwoChildren() throws IOException {
+    assertTrue(it.insert("Root", 100, 100));
+    assertTrue(it.insert("LeftChild", 50, 50));
+    assertTrue(it.insert("RightChild", 150, 150));
+    assertTrue(it.insert("LeftGrand", 25, 25));
+    assertTrue(it.insert("RightGrand", 175, 175));
+    
+    assertFuzzyEquals("Root (100, 100)\n", it.delete("Root"));
+    assertEquals("", it.info("Root"));
+    // Verify tree structure is maintained
+    assertFuzzyEquals("LeftChild", it.info("LeftChild"));
+    assertFuzzyEquals("RightChild", it.info("RightChild"));
+}
+
+/**
+ * Test BSTree removeNode - nonexistent city
+ */
+public void testRemoveNonexistent() throws IOException {
+    assertTrue(it.insert("Exists", 100, 100));
+    assertEquals("", it.delete("DoesNotExist"));
+    assertFuzzyEquals("Exists", it.info("Exists")); // Original still there
+}
+

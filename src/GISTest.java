@@ -195,6 +195,68 @@ public class GISTest extends TestCase {
         assertFuzzyEquals("right (125, 100)\n", it.info("right"));
         assertEquals("", it.info("wrong"));
 
-        System.out.println(it.delete("left"));
+        it.clear();
+        // Now testing delete, Single City
+        assertTrue(it.insert("SingleCity", 100, 100));
+        assertFuzzyEquals("SingleCity (100, 100)\n", it.delete("SingleCity"));
+        assertEquals("", it.info("SingleCity")); // Verify removal
+        it.clear();
+        // Now multiple deletes
+        assertTrue(it.insert("Duplicate", 50, 50));
+        assertTrue(it.insert("Duplicate", 75, 75));
+        assertTrue(it.insert("Duplicate", 25, 25));
+        String result = it.delete("Duplicate");
+        // Should remove all three cities with name "Duplicate"
+        assertTrue(result.contains("Duplicate (50, 50)"));
+        assertTrue(result.contains("Duplicate (75, 75)"));
+        assertTrue(result.contains("Duplicate (25, 25)"));
+        assertEquals("", it.info("Duplicate")); // All removed
+        // Now leafs
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("Leaf", 150, 150));
+        assertFuzzyEquals("Leaf (150, 150)\n", it.delete("Leaf"));
+        assertEquals("", it.info("Leaf"));
+        System.out.println(it.info("Root"));
+        assertFuzzyEquals("Root (100, 100)", it.info("Root"));
+
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("LeftChild", 50, 50));
+        assertTrue(it.insert("RightChild", 150, 150));
+        assertTrue(it.insert("LeftGrand", 25, 25));
+        assertTrue(it.insert("RightGrand", 175, 175));
+
+        assertFuzzyEquals("Root (100, 100)\n", it.delete("Root"));
+        assertEquals("", it.info("Root"));
+        it.clear();
+        assertTrue(it.insert("M", 100, 100)); // Root
+        assertTrue(it.insert("F", 50, 50)); // Left child
+        assertTrue(it.insert("T", 150, 150)); // Right child
+        assertTrue(it.insert("C", 25, 25)); // Left-left grandchild
+        assertTrue(it.insert("K", 75, 75)); // Left-right grandchild
+
+        // Now delete "F" which has exactly 2 children (C and K)
+        String results = it.delete("F");
+        assertTrue(results.contains("F"));
+
+        // Verify the tree structure is maintained
+        assertEquals("", it.info("F")); // F should be gone
+        assertFuzzyEquals("C (25, 25)", it.info("C")); // C should still exist
+        assertFuzzyEquals("K (75, 75)", it.info("K")); // K should still exist
+
+        it.clear();
+        assertTrue(it.insert("M", 100, 100)); // Root
+        assertTrue(it.insert("F", 50, 50)); // Left child
+        assertTrue(it.insert("T", 150, 150)); // Right child
+        assertTrue(it.insert("C", 25, 25)); // Left-left
+        assertTrue(it.insert("K", 75, 75)); // Left-right
+        assertTrue(it.insert("J", 70, 70)); // Makes K have a left child
+        assertTrue(it.insert("L", 80, 80)); // Makes K have a right child
+
+        // Now when deleting F, deleteMax(F.left) will need to recurse
+        // because the max path is C -> K -> L (L is max, but K has right child)
+        String resultb = it.delete("F");
+        assertTrue(resultb.contains("F"));
     }
 }
