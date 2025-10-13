@@ -124,20 +124,9 @@ public class GISDB implements GIS {
         // pass through
         City delCity = new City(name, 0, 0);
         String cities = bTree.removeNode(delCity, false);
-// if (cities.equals("")) {
-// return "";
-// }
-// String[] cityList = cities.split("\n");
-// String result = "";
-// for (String cityInfo : cityList) {
-// String[] parts = cityInfo.split(" ");
-// int x = Integer.parseInt(parts[1]);
-// int y = Integer.parseInt(parts[2]);
-// result += kTree.delete(x, y) + "\n";
-// City removeCity = new City(name, x, y);
-// bTree.delete(removeCity);
-// }
-// return result.trim();
+        if(cities.equals(""))
+            return "";
+                
         return cities;
     }
 
