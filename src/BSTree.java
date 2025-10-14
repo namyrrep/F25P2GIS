@@ -134,30 +134,38 @@ public class BSTree<T extends Comparable<T>> {
             return null;
         }
 
+        // Rely on the generic type's compareTo method for all comparisons.
         int comparison = base.getData().compareTo(targ);
+
         if (comparison > 0) {
             base.setLeft(removeHelp(base.getLeft(), targ, result, useEquals));
+            return base;
         }
-        else if (comparison < 0) {
+        if (comparison < 0) {
             base.setRight(removeHelp(base.getRight(), targ, result, useEquals));
+            return base;
         }
-        else {
 
-            result.append(base.getData().toString()).append("\n");
+        // --- Match Found ---
+        result.append(base.getData().toString()).append("\n");
 
-            if (base.getLeft() == null) {
-                return removeHelp(base.getRight(), targ, result, useEquals);
-            }
-            else {
-                BinaryNode<T> predecessor = getMax(base.getLeft());
-                base.setData(predecessor.getData());
-                base.setLeft(deleteMax(base.getLeft()));
-                // After replacement, continue searching the current node
-                // again
-                return removeHelp(base, targ, result, useEquals);
-            }
+        // Case 1: No left child. Continue search for duplicates on the right.
+        if (base.getLeft() == null) {
+            return removeHelp(base.getRight(), targ, result, useEquals);
         }
-        return base;
+        // Case 2: No right child.
+        if (base.getRight() == null) {
+            return base.getLeft();
+        }
+
+        // Case 3: Two children. Replace with predecessor.
+        BinaryNode<T> predecessor = getMax(base.getLeft());
+        base.setData(predecessor.getData());
+        base.setLeft(deleteMax(base.getLeft()));
+
+        // After replacement, re-run removeHelp on the CURRENT node.
+        // This continues the search for more duplicates from this position.
+        return removeHelp(base, targ, result, useEquals);
     }
 
 
@@ -168,7 +176,15 @@ public class BSTree<T extends Comparable<T>> {
     }
 
 
-    private BinaryNode<T> deleteMax(BinaryNode<T> input) {
-        return input.getLeft();
+    private BinaryNode<T> deleteMax(BinaryNode<T> node) {
+        // If the right child is null, this is the max node.
+        // Replace it with its left child (which could be null).
+        if (node.getRight() == null) {
+            return node.getLeft();
+        }
+
+        // Continue searching for the max node down the right side.
+        node.setRight(deleteMax(node.getRight()));
+        return node;
     }
 }

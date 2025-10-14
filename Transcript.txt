@@ -704,4 +704,87 @@ public void testGetMaxDeleteMaxErrorConditions() throws IOException {
     assertEquals("Should return empty when removing from empty tree", "", removeFromEmpty);
 }
 
+User: Gemini i am having trouble with my kd tree search method, it is not returning the correct number of nodes visited help me fix it and my delete method
+private BinaryNode<T> removeHelp(
+    BinaryNode<T> base,
+    T targ,
+    StringBuilder result,
+    boolean useEquals) {
+
+    if (base == null) {
+        return null;
+    }
+
+    // First, recursively clean the children.
+    base.setLeft(removeHelp(base.getLeft(), targ, result, useEquals));
+    base.setRight(removeHelp(base.getRight(), targ, result, useEquals));
+
+    // Now, check the current node.
+    int comparison = useEquals 
+        ? base.getData().compareTo(targ) 
+        : ((City) base.getData()).getName().compareTo(((City) targ).getName());
+
+    if (comparison == 0) {
+        // Match found, add to result.
+        result.append(base.getData().toString()).append("\n");
+
+        // Perform the deletion.
+        if (base.getLeft() == null) {
+            return base.getRight();
+        }
+        if (base.getRight() == null) {
+            return base.getLeft();
+        }
+
+        // Two children: replace data with predecessor and remove predecessor.
+        BinaryNode<T> predecessor = getMax(base.getLeft());
+        base.setData(predecessor.getData());
+        base.setLeft(deleteMax(base.getLeft()));
+    }
+    
+    return base;
+}
+
+private KDNode removeHelp(
+    KDNode base,
+    int[] cityKey,
+    int dimension,
+    int[] count,
+    StringBuilder result) {
+
+    if (base == null) {
+        return null; // City not found
+    }
+    count[0]++;
+    int[] baseKey = base.key();
+
+    // Step 1: Find the node to delete.
+    if (baseKey[0] == cityKey[0] && baseKey[1] == cityKey[1]) {
+        // Node found. Add its data to the result string.
+        result.append(base.data().toString());
+
+        // Case 1: Node has no left child. Replace with the right child.
+        if (base.left() == null) {
+            return base.right();
+        }
+        // Case 2: Node has no right child. Replace with the left child.
+        if (base.right() == null) {
+            return base.left();
+        }
+
+        // Case 3: Node has two children.
+        // Replace with the minimum node from the right subtree (the successor).
+        KDNode successor = findMin(base.right(), dimension, (dimension + 1) % 2, count);
+        base.setData(successor.data());
+        // Recursively delete the successor from its original location.
+        base.setRight(removeHelp(base.right(), successor.key(), (dimension + 1) % 2, count, new StringBuilder()));
+    }
+    else if (cityKey[dimension] < baseKey[dimension]) {
+        base.setLeft(removeHelp(base.left(), cityKey, (dimension + 1) % 2, count, result));
+    }
+    else {
+        base.setRight(removeHelp(base.right(), cityKey, (dimension + 1) % 2, count, result));
+    }
+    return base;
+}
  

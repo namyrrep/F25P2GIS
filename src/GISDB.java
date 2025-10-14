@@ -97,11 +97,19 @@ public class GISDB implements GIS {
     public String delete(int x, int y) {
         String result = kTree.delete(x, y);
         if (!result.equals("")) {
-            // Split result into node count and city name
+            // Split result into node count and city info
             String[] parts = result.split("\n", 2);
-            String cityName = parts[1];
+
+            String cityInfo = parts[1];
+            int parenthesisIndex = cityInfo.indexOf('(');
+            String cityName = (parenthesisIndex == -1) ? cityInfo.trim()
+                    : cityInfo.substring(0, parenthesisIndex).trim();
+
+
             City delCity = new City(cityName, x, y);
+            // This will now correctly find the city in the bTree
             bTree.removeNode(delCity, true);
+
             return result;
         }
         return "";
@@ -139,7 +147,6 @@ public class GISDB implements GIS {
             kTree.delete(x, y);
         }
         return cities;
-
     }
 
 
