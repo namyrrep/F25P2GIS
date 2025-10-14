@@ -70,6 +70,7 @@ public class City implements Comparable<City> {
         return yValue;
     }
 
+
     /**
      * This is the toString method for the City class.
      * 
@@ -92,10 +93,6 @@ public class City implements Comparable<City> {
      * @return boolean true if they are equal false if not
      */
     public boolean equals(Object otherCity) {
-        // If the reference is the same
-        if (this == otherCity) {
-            return true;
-        }
         // If the parameter is null or not the City class
         if (otherCity == null || otherCity.getClass() != this.getClass()) {
             return false;

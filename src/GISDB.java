@@ -99,11 +99,9 @@ public class GISDB implements GIS {
         if (!result.equals("")) {
             // Split result into node count and city name
             String[] parts = result.split("\n", 2);
-            String cityName = parts.length > 1 ? parts[1] : "";
-            if (!cityName.equals("")) {
-                City delCity = new City(cityName, x, y);
-                bTree.removeNode(delCity, true);
-            }
+            String cityName = parts[1];
+            City delCity = new City(cityName, x, y);
+            bTree.removeNode(delCity, true);
             return result;
         }
         return "";

@@ -142,36 +142,21 @@ public class BSTree<T extends Comparable<T>> {
             base.setRight(removeHelp(base.getRight(), targ, result, useEquals));
         }
         else {
-            boolean shouldDelete = useEquals
-                ? base.getData().equals(targ)
-                : true;
 
-            if (shouldDelete) {
-                result.append(base.getData().toString()).append("\n");
+            result.append(base.getData().toString()).append("\n");
 
-                if (base.getLeft() == null) {
-                    return removeHelp(base.getRight(), targ, result, useEquals);
-                }
-                else if (base.getRight() == null) {
-                    return removeHelp(base.getLeft(), targ, result, useEquals);
-                }
-                else {
-                    BinaryNode<T> predecessor = getMax(base.getLeft());
-                    base.setData(predecessor.getData());
-                    base.setLeft(deleteMax(base.getLeft()));
-                    // After replacement, continue searching the current node
-                    // again
-                    return removeHelp(base, targ, result, useEquals);
-                }
+            if (base.getLeft() == null) {
+                return removeHelp(base.getRight(), targ, result, useEquals);
             }
             else {
-                base.setLeft(removeHelp(base.getLeft(), targ, result,
-                    useEquals));
-                base.setRight(removeHelp(base.getRight(), targ, result,
-                    useEquals));
+                BinaryNode<T> predecessor = getMax(base.getLeft());
+                base.setData(predecessor.getData());
+                base.setLeft(deleteMax(base.getLeft()));
+                // After replacement, continue searching the current node
+                // again
+                return removeHelp(base, targ, result, useEquals);
             }
         }
-
         return base;
     }
 
@@ -184,9 +169,6 @@ public class BSTree<T extends Comparable<T>> {
 
 
     private BinaryNode<T> deleteMax(BinaryNode<T> input) {
-        if (input.getRight() == null)
-            return input.getLeft();
-        input.setRight(deleteMax(input.getRight()));
-        return input;
+        return input.getLeft();
     }
 }

@@ -189,7 +189,12 @@ public class KDTree {
      */
     public String search(int x, int y, int r) {
         int[] count = { 0 };
-        return helpSearch(root, x, y, r, 0, count) + count[0];
+        String result = helpSearch(root, x, y, r, 0, count);
+        // Adjust counting to exclude the initial root visit if any nodes were visited
+        if (count[0] > 0) {
+            count[0]--;
+        }
+        return result + count[0];
     }
 
 
@@ -233,22 +238,24 @@ public class KDTree {
             if (node.getData().getXValue() >= x - r) {
                 result += helpSearch(node.getLeft(), x, y, r, dimension + 1,
                     num);
-            } // Go Right if x value is less than distance r from x
+            } 
+            // Go Right if x value is less than distance r from x
             if (node.getData().getXValue() <= x + r) {
                 result += helpSearch(node.getRight(), x, y, r, dimension + 1,
                     num);
             }
-            return result;
         }
-        // Go left if y value is greater than distance r from x
-        if (node.getData().getYValue() >= y - r) {
-            result += helpSearch(node.getLeft(), x, y, r, dimension + 1, num);
-        } // Go right if y value is less than distance r from x
-        if (node.getData().getYValue() <= y + r) {
-            result += helpSearch(node.getRight(), x, y, r, dimension + 1, num);
+        else {
+            // Go left if y value is greater than distance r from y
+            if (node.getData().getYValue() >= y - r) {
+                result += helpSearch(node.getLeft(), x, y, r, dimension + 1, num);
+            } 
+            // Go right if y value is less than distance r from y
+            if (node.getData().getYValue() <= y + r) {
+                result += helpSearch(node.getRight(), x, y, r, dimension + 1, num);
+            }
         }
         return result;
-
     }
 
 

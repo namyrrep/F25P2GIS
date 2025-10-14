@@ -533,3 +533,175 @@ public void testHelpRemoveConditionalLogic() throws IOException {
     it.clear();
     assertTrue(it.insert("Complex", 80, 80));
     assertTrue(it.insert("CL", 60, 100));       // Complex left
+
+            if (this == otherCity) {
+            return true;
+        }
+        // If the parameter is null or not the City class
+        if (otherCity == null || otherCity.getClass() != this.getClass()) {
+            return false;
+        }
+        // Gets a City object from the parameterized Object.
+        City city = (City)otherCity;
+
+        return this.getCityName().equals(city.getCityName())
+            && this.xValue == city.xValue && this.yValue == city.yValue;
+            
+ Help me test them these additions
+ if(input == null)
+ in both getmax and deltete max
+ /**
+ * Test null handling in getMax and deleteMax methods
+ * 
+ * @throws IOException
+ */
+public void testGetMaxAndDeleteMaxNullHandling() throws IOException {
+    BSTree<City> bst = new BSTree<City>();
+    
+    // Test getMax with null input - should return null without exception
+    // This tests the null check at the beginning of getMax
+    BinaryNode<City> maxResult = bst.getMax(null);
+    assertNull("getMax with null input should return null", maxResult);
+    
+    // Test deleteMax with null input - should return null without exception  
+    // This tests the null check at the beginning of deleteMax
+    BinaryNode<City> deleteResult = bst.deleteMax(null);
+    assertNull("deleteMax with null input should return null", deleteResult);
+    
+    // Test getMax with empty tree (indirectly tests null handling)
+    assertTrue(bst.insert(new City("Test", 50, 50)));
+    String result = bst.removeNode(new City("Test", 50, 50), false);
+    assertTrue("Should remove the city", result.contains("Test"));
+    
+    // Tree is now empty, any further operations should handle null gracefully
+    String emptyResult = bst.removeNode(new City("NonExistent", 10, 10), false);
+    assertEquals("Should return empty string for empty tree", "", emptyResult);
+}
+
+/**
+ * Test getMax and deleteMax edge cases with single nodes
+ * 
+ * @throws IOException  
+ */
+public void testGetMaxDeleteMaxSingleNode() throws IOException {
+    BSTree<City> bst = new BSTree<City>();
+    City singleCity = new City("Single", 100, 100);
+    bst.insert(singleCity);
+    
+    // Create a scenario where getMax is called on a single node
+    // This happens when removing a node with two children
+    bst.insert(new City("Left", 50, 50));
+    bst.insert(new City("Right", 150, 150));
+    
+    // Remove root - this will call getMax on left subtree (which is just "Left")
+    String result = bst.removeNode(singleCity, false);
+    assertTrue("Should remove Single", result.contains("Single"));
+    
+    // Verify tree structure is maintained
+    assertFalse("Single should be gone", bst.findNode(singleCity).contains("Single"));
+    assertTrue("Left should still exist", bst.findNode(new City("Left", 50, 50)).contains("Left"));
+}
+
+/**
+ * Test deleteMax with node having only left child
+ * 
+ * @throws IOException
+ */
+public void testDeleteMaxWithLeftChildOnly() throws IOException {
+    BSTree<City> bst = new BSTree<City>();
+    
+    // Build tree: Root -> Left -> LeftRight (no right child of LeftRight)
+    bst.insert(new City("Root", 100, 100));
+    bst.insert(new City("Left", 50, 50));  
+    bst.insert(new City("LeftRight", 75, 75));
+    bst.insert(new City("LeftRightLeft", 65, 65)); // LeftRight has only left child
+    
+    // When we remove Root, it will:
+    // 1. Find max of left subtree: getMax(Left) = LeftRight
+    // 2. Replace Root with LeftRight  
+    // 3. Call deleteMax(Left) which will eventually hit deleteMax(LeftRight)
+    // 4. LeftRight has no right child, so deleteMax returns LeftRight.getLeft()
+    
+    String result = bst.removeNode(new City("Root", 100, 100), false);
+    assertTrue("Should remove Root", result.contains("Root"));
+    
+    // Verify LeftRightLeft is now properly connected
+    assertTrue("LeftRightLeft should still exist", 
+        bst.findNode(new City("LeftRightLeft", 65, 65)).contains("LeftRightLeft"));
+}
+
+/**
+ * Test getMax traversal through multiple right nodes
+ * 
+ * @throws IOException
+ */
+public void testGetMaxDeepTraversal() throws IOException {
+    BSTree<City> bst = new BSTree<City>();
+    
+    // Create a right-heavy subtree to test getMax traversal
+    bst.insert(new City("Root", 100, 100));
+    bst.insert(new City("A", 50, 50));
+    bst.insert(new City("B", 60, 60));
+    bst.insert(new City("C", 70, 70));  
+    bst.insert(new City("D", 80, 80));
+    bst.insert(new City("E", 90, 90)); // This should be the max of left subtree
+    
+    // Remove Root to trigger getMax traversal
+    String result = bst.removeNode(new City("Root", 100, 100), false);
+    assertTrue("Should remove Root", result.contains("Root"));
+    
+    // E should have been moved to root position
+    String treeContents = bst.toString();
+    assertTrue("E should now be in the tree structure", treeContents.contains("E"));
+}
+
+/**
+ * Test deleteMax recursive chain removal
+ * 
+ * @throws IOException
+ */
+public void testDeleteMaxRecursiveChain() throws IOException {
+    BSTree<City> bst = new BSTree<City>();
+    
+    // Build tree with deep right chain that requires recursive deleteMax
+    bst.insert(new City("Root", 50, 50));
+    bst.insert(new City("L1", 25, 25));
+    bst.insert(new City("L2", 30, 30));
+    bst.insert(new City("L3", 35, 35));
+    bst.insert(new City("L4", 40, 40)); // Max of left subtree
+    bst.insert(new City("L4Left", 38, 38)); // L4 has left child
+    
+    // Remove Root - deleteMax must recursively traverse to remove L4
+    // and properly connect L4Left
+    String result = bst.removeNode(new City("Root", 50, 50), false);
+    assertTrue("Should remove Root", result.contains("Root"));
+    
+    // Verify L4Left is still connected properly
+    assertTrue("L4Left should still exist", 
+        bst.findNode(new City("L4Left", 38, 38)).contains("L4Left"));
+}
+
+/**
+ * Test error conditions and boundary cases
+ * 
+ * @throws IOException
+ */
+public void testGetMaxDeleteMaxErrorConditions() throws IOException {
+    // Test with minimal tree structures
+    BSTree<City> bst = new BSTree<City>();
+    
+    // Single node tree
+    bst.insert(new City("Only", 50, 50));
+    String result = bst.removeNode(new City("Only", 50, 50), false);
+    assertTrue("Should remove single node", result.contains("Only"));
+    
+    // Tree should now be empty - further operations should handle gracefully
+    String emptyResult = bst.findNode(new City("Only", 50, 50));
+    assertEquals("Should return empty for removed node", "", emptyResult);
+    
+    // Test removing from already empty tree
+    String removeFromEmpty = bst.removeNode(new City("Ghost", 10, 10), false);
+    assertEquals("Should return empty when removing from empty tree", "", removeFromEmpty);
+}
+
+ 
