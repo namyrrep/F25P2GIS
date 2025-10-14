@@ -62,17 +62,6 @@ public class City implements Comparable<City> {
 
 
     /**
-     * This is the setter method for xValue field.
-     * 
-     * @param newX
-     *            is the new x cord
-     */
-    public void setXValue(int newX) {
-        xValue = newX;
-    }
-
-
-    /**
      * This is the getter method for yValue field.
      * 
      * @return int the y value
@@ -80,18 +69,6 @@ public class City implements Comparable<City> {
     public int getYValue() {
         return yValue;
     }
-
-
-    /**
-     * This is the setter method for yValue field.
-     * 
-     * @param newY
-     *            is the new Y value
-     */
-    public void setYValue(int newY) {
-        yValue = newY;
-    }
-
 
     /**
      * This is the toString method for the City class.

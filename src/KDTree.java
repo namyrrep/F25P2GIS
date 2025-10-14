@@ -305,12 +305,15 @@ public class KDTree {
      *            Dimension Comparison
      * @param dimension
      *            Actual Dimension
+     * @param nodesVisited
+     *            Counter for nodes visited
      * @return BinaryNode<City>
      */
     private BinaryNode<City> findMin(
         BinaryNode<City> node,
         int descrim,
-        int dimension) {
+        int dimension,
+        int[] nodesVisited) {
         BinaryNode<City> temp1, temp2;
         int x1 = 0;
         int y1 = 0;
@@ -319,8 +322,11 @@ public class KDTree {
         if (node == null) {
             return null;
         }
+
+        nodesVisited[0]++; // Count this node as visited
+
         // Gets the minimum descrim value from left branch.
-        temp1 = findMin(node.getLeft(), descrim, dimension + 1);
+        temp1 = findMin(node.getLeft(), descrim, dimension + 1, nodesVisited);
         if (temp1 != null) {
             x1 = temp1.getData().getXValue();
             y1 = temp1.getData().getYValue();
@@ -328,7 +334,8 @@ public class KDTree {
         // Must check right branch if ordered by opposite dimension
         if (descrim % 2 != dimension % 2) {
             // Gets the minimum descrim value from right branch.
-            temp2 = findMin(node.getRight(), descrim, dimension + 1);
+            temp2 = findMin(node.getRight(), descrim, dimension + 1,
+                nodesVisited);
             if (temp2 != null) {
                 x2 = temp2.getData().getXValue();
                 y2 = temp2.getData().getYValue();
@@ -366,6 +373,8 @@ public class KDTree {
      *            StringBuilder to store city name
      * @param nodesVisited
      *            Counter for nodes visited
+     * @param isOriginalTarget
+     *            True if this is the original target node being deleted
      * @return BinaryNode after removal
      */
     private BinaryNode<City> helpRemove(
@@ -374,35 +383,38 @@ public class KDTree {
         int y,
         int dimension,
         StringBuilder sb,
-        int[] nodesVisited) {
+        int[] nodesVisited,
+        boolean isOriginalTarget) {
         // If there is nothing to remove.
         if (node == null) {
             return null;
         }
-        
+
         nodesVisited[0]++;
 
         // Found node to delete.
         if (node.getData().getXValue() == x && node.getData()
             .getYValue() == y) {
-            // Append deleted city name to StringBuilder
-            sb.append(node.getData().getCityName());
+            // Only append city name if this is the original target
+            if (isOriginalTarget) {
+                sb.append(node.getData().getCityName());
+            }
             // If there is a right subtree
             if (node.getRight() != null) {
                 BinaryNode<City> minNode = findMin(node.getRight(), dimension,
-                    dimension + 1);
+                    dimension + 1, nodesVisited);
                 node.setData(minNode.getData());
                 node.setRight(helpRemove(node.getRight(), minNode.getData()
                     .getXValue(), minNode.getData().getYValue(), dimension + 1,
-                    sb, nodesVisited));
+                    sb, nodesVisited, false)); // Not original target
             } // If there is a left subtree, but not a right.
             else if (node.getLeft() != null) {
                 BinaryNode<City> minNode = findMin(node.getLeft(), dimension,
-                    dimension + 1);
+                    dimension + 1, nodesVisited);
                 node.setData(minNode.getData());
                 node.setRight(helpRemove(node.getLeft(), minNode.getData()
                     .getXValue(), minNode.getData().getYValue(), dimension + 1,
-                    sb, nodesVisited));
+                    sb, nodesVisited, false)); // Not original target
                 node.setLeft(null);
             } // If there is no tree
             else {
@@ -413,10 +425,12 @@ public class KDTree {
         // If the node has not been found.
         if ((dimension % 2 == 0 && x < node.getData().getXValue()) || (dimension
             % 2 == 1 && y < node.getData().getYValue())) {
-            node.setLeft(helpRemove(node.getLeft(), x, y, dimension + 1, sb, nodesVisited));
+            node.setLeft(helpRemove(node.getLeft(), x, y, dimension + 1, sb,
+                nodesVisited, isOriginalTarget));
         }
         else {
-            node.setRight(helpRemove(node.getRight(), x, y, dimension + 1, sb, nodesVisited));
+            node.setRight(helpRemove(node.getRight(), x, y, dimension + 1, sb,
+                nodesVisited, isOriginalTarget));
         }
         return node;
     }
@@ -434,7 +448,7 @@ public class KDTree {
     public String delete(int x, int y) {
         StringBuilder cityName = new StringBuilder();
         int[] nodesVisited = { 0 };
-        root = helpRemove(root, x, y, 0, cityName, nodesVisited);
+        root = helpRemove(root, x, y, 0, cityName, nodesVisited, true);
         if (cityName.length() == 0) {
             return "";
         }

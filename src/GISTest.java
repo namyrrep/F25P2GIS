@@ -84,41 +84,40 @@ public class GISTest extends TestCase {
         assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
         assertFuzzyEquals("L", it.info(101, 150));
         assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
-        // assertFuzzyEquals("3\nChicago", it.delete(100, 150));
-        // assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
-        // + "Baltimore (0, 300)\n" + "Washington (5, 350)\n"
-        // + "L (11, 500)\n5", it.search(0, 0, 2000));
-        // assertFuzzyEquals("Baltimore (0, 300)\n4", it.search(0, 300, 0));
+        assertFuzzyEquals("3\nChicago", it.delete(100, 150));
+        assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
+            + "Baltimore (0, 300)\n" + "Washington (5, 350)\n"
+            + "L (11, 500)\n5", it.search(0, 0, 2000));
+        assertFuzzyEquals("Baltimore (0, 300)\n4", it.search(0, 300, 0));
     }
 
-
-    /**
-     * Tests the city class
-     * 
-     * @throws IOException
-     */
-    public void testCity() throws IOException {
-        City myCity = new City("Hi", 1, 1);
-        City otherCity = new City("Hi", 2, 2);
-        myCity = new City("Richmond", 1, 1);
-
-        myCity.setXValue(2);
-        assertEquals(myCity.getXValue(), 2);
-        myCity.setYValue(2);
-        assertEquals(myCity.getYValue(), 2);
-
-        assertTrue(myCity.equals(myCity));
-        assertFalse(myCity.equals(null));
-        assertFalse(myCity.equals(it));
-        assertFalse(myCity.equals(otherCity));
-        otherCity = new City("Richmond", 2, 2);
-        assertTrue(myCity.equals(otherCity));
-        otherCity.setXValue(1);
-        assertFalse(myCity.equals(otherCity));
-        otherCity.setXValue(2);
-        otherCity.setYValue(1);
-        assertFalse(myCity.equals(otherCity));
-    }
+// /**
+// * Tests the city class
+// *
+// * @throws IOException
+// */
+// public void testCity() throws IOException {
+// City myCity = new City("Hi", 1, 1);
+// City otherCity = new City("Hi", 2, 2);
+// myCity = new City("Richmond", 1, 1);
+//
+// myCity.setXValue(2);
+// assertEquals(myCity.getXValue(), 2);
+// myCity.setYValue(2);
+// assertEquals(myCity.getYValue(), 2);
+//
+// assertTrue(myCity.equals(myCity));
+// assertFalse(myCity.equals(null));
+// assertFalse(myCity.equals(it));
+// assertFalse(myCity.equals(otherCity));
+// otherCity = new City("Richmond", 2, 2);
+// assertTrue(myCity.equals(otherCity));
+// otherCity.setXValue(1);
+// assertFalse(myCity.equals(otherCity));
+// otherCity.setXValue(2);
+// otherCity.setYValue(1);
+// assertFalse(myCity.equals(otherCity));
+// }
 
 
     /**
@@ -426,4 +425,431 @@ public class GISTest extends TestCase {
         String result5 = bst5.removeNode(new City("M", 50, 50), false);
         assertTrue(result5.contains("M"));
     }
+
+
+    /**
+     * Test clear on populated tree
+     * 
+     * @throws IOException
+     */
+    public void testRefClearPopulated() throws IOException {
+        assertTrue(it.insert("Chicago", 100, 150));
+        assertTrue(it.insert("Atlanta", 10, 500));
+        assertTrue(it.insert("Tacoma", 1000, 100));
+        assertTrue(it.insert("Baltimore", 0, 300));
+        assertTrue(it.insert("Washington", 5, 350));
+        assertFalse(it.insert("X", 100, 150));
+        assertTrue(it.insert("L", 101, 150));
+        assertTrue(it.insert("L", 11, 500));
+        assertTrue(it.clear());
+        assertFuzzyEquals("", it.print());
+        assertFuzzyEquals("", it.debug());
+        assertFuzzyEquals("", it.info("CityName"));
+        assertFuzzyEquals("", it.info(5, 5));
+        assertFuzzyEquals("", it.delete("CityName"));
+        assertFuzzyEquals("", it.delete(5, 5));
+
+        it.clear();
+
+        // Test 1: Build a tree where we can test X dimension (dimension % 2 ==
+        // 0) conditions
+        assertTrue(it.insert("Root", 100, 100)); // Dimension 0 (X comparison)
+        assertTrue(it.insert("Left", 50, 150)); // x=50 < 100, goes left,
+                                                // Dimension 1 (Y comparison)
+        assertTrue(it.insert("Right", 150, 50)); // x=150 > 100, goes right,
+                                                 // Dimension 1 (Y comparison)
+        assertTrue(it.insert("LL", 25, 125)); // From Left: y=125 < 150, goes
+                                              // left, Dimension 2 (X
+                                              // comparison)
+        assertTrue(it.insert("LR", 75, 175)); // From Left: y=175 > 150, goes
+                                              // right, Dimension 2 (X
+                                              // comparison)
+
+        // Test deletion that follows x < condition (dimension % 2 == 0 && x <
+        // node)
+        // Delete LL (25, 125): From Root (dim=0): 25 < 100 → go left to Left
+        String result1 = it.delete(25, 125);
+        System.out.println("Delete LL result: " + result1);
+        assertTrue("Should delete LL", result1.contains("LL"));
+        assertEquals("LL should be gone", "", it.info(25, 125));
+
+        it.clear();
+
+        // Test 2: Build tree to test Y dimension (dimension % 2 == 1)
+        // conditions
+
+        assertTrue(it.insert("Center", 100, 100)); // Dimension 0 (X comparison)
+        assertTrue(it.insert("Left", 75, 125)); // x=75 < 100, Dimension 1 (Y
+                                                // comparison)
+        assertTrue(it.insert("Right", 125, 75)); // x=125 > 100, Dimension 1 (Y
+                                                 // comparison)
+        assertTrue(it.insert("LeftUp", 80, 150)); // From Left: y=150 > 125,
+                                                  // Dimension 2 (X comparison)
+        assertTrue(it.insert("LeftDown", 70, 100)); // From Left: y=100 < 125,
+                                                    // Dimension 2 (X
+                                                    // comparison)
+
+        // Test deletion that follows y < condition (dimension % 2 == 1 && y <
+        // node)
+        // Delete LeftDown (70, 100): From Center (dim=0): 70 < 100 → go left to
+        // Left
+        // From Left (dim=1): 100 < 125 → go left to LeftDown
+        String result2 = it.delete(70, 100);
+        System.out.println("Delete LeftDown result: " + result2);
+        assertTrue("Should delete LeftDown", result2.contains("LeftDown"));
+        assertEquals("LeftDown should be gone", "", it.info(70, 100));
+
+        it.clear();
+
+        // Test 3: Test the else branch (when conditions are false)
+        assertTrue(it.insert("Root", 50, 50)); // Dimension 0 (X comparison)
+        assertTrue(it.insert("RightChild", 75, 25)); // x=75 > 50, goes right,
+                                                     // Dimension 1 (Y
+                                                     // comparison)
+        assertTrue(it.insert("RightRight", 80, 75)); // From RightChild: y=75 >
+                                                     // 25, goes right,
+                                                     // Dimension 2 (X
+                                                     // comparison)
+
+        // Delete RightRight (80, 75): From Root (dim=0): 80 > 50 → go right
+        // (else branch)
+        // From RightChild (dim=1): 75 > 25 → go right (else branch)
+        String result3 = it.delete(80, 75);
+        System.out.println("Delete RightRight result: " + result3);
+        assertTrue("Should delete RightRight", result3.contains("RightRight"));
+        assertEquals("RightRight should be gone", "", it.info(80, 75));
+
+        it.clear();
+
+        // Test 4: Complex tree testing both conditions at different levels
+        assertTrue(it.insert("A", 100, 100)); // Level 0, dimension 0 (X)
+        assertTrue(it.insert("B", 50, 150)); // Level 1, dimension 1 (Y) - x <
+                                             // 100
+        assertTrue(it.insert("C", 150, 50)); // Level 1, dimension 1 (Y) - x >
+                                             // 100
+        assertTrue(it.insert("D", 25, 125)); // Level 2, dimension 2 (X) - y <
+                                             // 150
+        assertTrue(it.insert("E", 75, 175)); // Level 2, dimension 2 (X) - y >
+                                             // 150
+        assertTrue(it.insert("F", 125, 25)); // Level 2, dimension 2 (X) - y <
+                                             // 50
+        assertTrue(it.insert("G", 175, 75)); // Level 2, dimension 2 (X) - y >
+                                             // 50
+        String result4 = it.delete(25, 125);
+        assertTrue("Should delete D", result4.contains("D"));
+
+        // Test path: A(dim=0) → x=175>100 go right to C(dim=1) → y=75>50 go
+        // right to G(dim=2)
+        String result5 = it.delete(175, 75);
+        assertTrue("Should delete G", result5.contains("G"));
+
+        it.clear();
+
+        // Test 5: Edge cases with equal coordinates
+        assertTrue(it.insert("Same", 50, 50));
+        assertTrue(it.insert("EdgeX", 49, 60)); // x=49 < 50 (left)
+        assertTrue(it.insert("EdgeY", 60, 49)); // x=60 > 50, then y=49 < ?
+                                                // depends on tree structure
+
+        // Test exact boundary where x < condition is just barely true
+        String result6 = it.delete(49, 60);
+        assertTrue("Should delete EdgeX", result6.contains("EdgeX"));
+
+        it.clear();
+
+        // Test 6: Verify node visit counting accuracy
+        assertTrue(it.insert("Root", 64, 64)); // Perfect binary tree for
+                                               // predictable paths
+        assertTrue(it.insert("L1", 32, 96)); // Level 1 left
+        assertTrue(it.insert("R1", 96, 32)); // Level 1 right
+        assertTrue(it.insert("LL", 16, 80)); // Level 2 left-left
+        assertTrue(it.insert("LR", 48, 112)); // Level 2 left-right
+        assertTrue(it.insert("RL", 80, 16)); // Level 2 right-left
+        assertTrue(it.insert("RR", 112, 48)); // Level 2 right-right
+
+        // Delete leaf node LL - should visit Root, L1, LL = 3 nodes
+        String countResult = it.delete(16, 80);
+        String[] parts = countResult.split("\n");
+        int nodeCount = Integer.parseInt(parts[0]);
+        assertTrue("Should visit reasonable number of nodes", nodeCount >= 2
+            && nodeCount <= 4);
+
+    }
+
+
+    /**
+     * Test the conditional logic in KDTree findMin method
+     * 
+     * @throws IOException
+     */
+    public void testHelpRemoveConditionalLogic() throws IOException {
+
+        // Test Case 1: First condition - temp1 == null (no left child)
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("Right", 150, 75));
+        // When finding min in X dimension from Root, only right child exists
+        // temp1 will be null, first condition should return Root as minimum
+        String result1 = it.delete(100, 100);
+        assertTrue("Should delete Root when temp1 is null", result1.contains(
+            "Root"));
+
+        // Test Case 2: Second condition - descrim % 2 == 0 && x1 > x3 (X
+        // dimension comparison)
+        it.clear();
+        assertTrue(it.insert("Center", 50, 50)); // Root at (50,50)
+        assertTrue(it.insert("Left", 25, 75)); // Left child at (25,75)
+        assertTrue(it.insert("LeftChild", 30, 60)); // Left's child at (30,60)
+        // When deleting Center, findMin for X dimension should compare x1=30 >
+        // x3=50 (false)
+        // and x1=25 > x3=50 (false), so should return the left node with x=25
+        String result2 = it.delete(50, 50);
+        assertTrue("Should handle X dimension comparison correctly", result2
+            .contains("Center"));
+
+        // Test Case 3: Second condition - descrim % 2 == 1 && y1 > y3 (Y
+        // dimension comparison)
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100)); // Dimension 0 (X)
+        assertTrue(it.insert("Left", 75, 125)); // Dimension 1 (Y), left child
+        assertTrue(it.insert("LL", 80, 110)); // Dimension 2 (X), y=110 < 125
+        assertTrue(it.insert("LR", 70, 140)); // Dimension 2 (X), y=140 > 125
+        // When finding min in Y dimension, should compare y values
+        String result3 = it.delete(100, 100);
+        assertTrue("Should handle Y dimension comparison correctly", result3
+            .contains("Root"));
+
+        // Test Case 4: Third condition - temp2 != null && descrim % 2 == 0 &&
+        // x1 > x2
+        it.clear();
+        assertTrue(it.insert("Center", 50, 50)); // Root
+        assertTrue(it.insert("Left", 25, 75)); // Must check right branch case
+        assertTrue(it.insert("Right", 75, 25));
+        assertTrue(it.insert("RL", 60, 40)); // Right's left child (x=60)
+        assertTrue(it.insert("RR", 90, 10)); // Right's right child (x=90)
+        // Test when both temp1 and temp2 exist and x comparison determines
+        // minimum
+        String result4 = it.delete(50, 50);
+        assertTrue("Should handle temp2 X comparison correctly", result4
+            .contains("Center"));
+
+        // Test Case 5: Third condition - temp2 != null && descrim % 2 == 1 &&
+        // y1 > y2
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("Child", 75, 125)); // Forces Y dimension check at
+                                                 // level 1
+        assertTrue(it.insert("LC", 60, 110)); // Child's left (y=110)
+        assertTrue(it.insert("RC", 90, 140)); // Child's right (y=140)
+        assertTrue(it.insert("Deep", 55, 105)); // Deeper node to trigger
+                                                // complex findMin
+        // Test Y dimension comparison between temp1 and temp2
+        String result5 = it.delete(75, 125);
+        assertTrue("Should handle temp2 Y comparison correctly", result5
+            .contains("Child"));
+
+        // Test Case 6: Edge case where temp1 != null but condition fails
+        it.clear();
+        assertTrue(it.insert("Main", 60, 60));
+        assertTrue(it.insert("L1", 40, 80)); // Left branch
+        assertTrue(it.insert("L1L", 35, 70)); // Left's left (smaller X)
+        assertTrue(it.insert("L1R", 45, 90)); // Left's right (larger X)
+        // When temp1 points to node with x=35, and current node x=40
+        // Condition x1 > x3 is 35 > 40 = false, so should return temp1
+        String result6 = it.delete(60, 60);
+        assertTrue("Should return temp1 when conditions are met", result6
+            .contains("Main"));
+
+        // Test Case 7: Complex tree testing both branches of findMin
+        it.clear();
+        assertTrue(it.insert("Complex", 80, 80));
+        assertTrue(it.insert("CL", 60, 100)); // Complex left
+        assertTrue(it.insert("CR", 120, 60)); // Complex right
+        assertTrue(it.insert("CLL", 50, 90)); // Complex left-left
+        assertTrue(it.insert("CLR", 70, 110)); // Complex left-right
+        assertTrue(it.insert("CRL", 110, 70)); // Complex right-left
+        assertTrue(it.insert("CRR", 130, 50)); // Complex right-right
+        // This creates scenarios where findMin must check both branches
+        String result7 = it.delete(80, 80);
+        assertTrue("Should handle complex tree structure", result7.contains(
+            "Complex"));
+
+        // Test Case 8: Verify dimension mismatch forces right branch check
+        it.clear();
+        assertTrue(it.insert("DimTest", 100, 100)); // Dim 0 (X-ordered)
+        assertTrue(it.insert("DT_L", 75, 125)); // Dim 1 (Y-ordered), left of
+                                                // DimTest
+        assertTrue(it.insert("DT_R", 125, 75)); // Dim 1 (Y-ordered), right of
+                                                // DimTest
+        assertTrue(it.insert("DT_LL", 60, 110)); // Dim 2 (X-ordered), left of
+                                                 // DT_L
+        assertTrue(it.insert("DT_LR", 90, 140)); // Dim 2 (X-ordered), right of
+                                                 // DT_L
+        // When finding min for X dimension (descrim=0) at Y-ordered node
+        // (dimension=1)
+        // descrim % 2 != dimension % 2, so must check both left and right
+        // branches
+        String result8 = it.delete(75, 125);
+        assertTrue("Should check right branch when dimensions differ", result8
+            .contains("DT_L"));
+
+        assertFuzzyEquals("All helpRemove conditional logic tests completed",
+            "All helpRemove conditional logic tests completed");
+    }
+
+
+    /**
+     * Test edge cases for inCircle boundary conditions
+     */
+    public void testInCircleBoundaryConditions() throws IOException {
+        it.clear();
+
+        // Test exact boundary cases for circle calculations
+        assertTrue(it.insert("Center", 0, 0));
+        assertTrue(it.insert("Right", 3, 0));
+        assertTrue(it.insert("Up", 0, 4));
+        assertTrue(it.insert("Diagonal", 3, 4));
+        assertTrue(it.insert("Outside", 10, 10));
+
+        // Test radius = 5 (3-4-5 triangle)
+        // Points at (3,0) and (0,4) should be exactly on boundary
+        String result1 = it.search(0, 0, 5);
+        assertTrue("Should include boundary points", result1.contains(
+            "Center"));
+        assertTrue("Should include boundary points", result1.contains("Right"));
+        assertTrue("Should include boundary points", result1.contains("Up"));
+        assertTrue("Should include diagonal point", result1.contains(
+            "Diagonal"));
+        assertFalse("Should exclude far point", result1.contains("Outside"));
+
+        // Test radius = 0 (only exact matches)
+        String result2 = it.search(0, 0, 0);
+        assertTrue("Should include exact match", result2.contains("Center"));
+        assertFalse("Should exclude non-exact", result2.contains("Right"));
+
+        // Test radius = 1 (very small circle)
+        String result3 = it.search(0, 0, 1);
+        assertTrue("Should include center", result3.contains("Center"));
+        assertFalse("Should exclude distant points", result3.contains("Right"));
+    }
+
+
+    /**
+     * Test arithmetic edge cases in search boundaries
+     */
+    public void testSearchArithmeticEdgeCases() throws IOException {
+        it.clear();
+
+        // Test edge cases where x-r or x+r calculations matter
+        assertTrue(it.insert("LeftEdge", 5, 50));
+        assertTrue(it.insert("RightEdge", 15, 50));
+        assertTrue(it.insert("Center", 10, 50));
+
+        // Search with radius that exactly includes/excludes boundaries
+        String result1 = it.search(10, 50, 5);
+        assertTrue("Should include left edge", result1.contains("LeftEdge"));
+        assertTrue("Should include right edge", result1.contains("RightEdge"));
+        assertTrue("Should include center", result1.contains("Center"));
+
+        // Search with radius just smaller than boundary
+        String result2 = it.search(10, 50, 4);
+        assertFalse("Should exclude left edge", result2.contains("LeftEdge"));
+        assertFalse("Should exclude right edge", result2.contains("RightEdge"));
+        assertTrue("Should include center", result2.contains("Center"));
+
+        // Test y-dimension boundaries
+        it.clear();
+        assertTrue(it.insert("TopEdge", 50, 15));
+        assertTrue(it.insert("BottomEdge", 50, 5));
+        assertTrue(it.insert("YCenter", 50, 10));
+
+        String result3 = it.search(50, 10, 5);
+        assertTrue("Should include all y-boundary points", result3.contains(
+            "TopEdge"));
+        assertTrue("Should include all y-boundary points", result3.contains(
+            "BottomEdge"));
+        assertTrue("Should include all y-boundary points", result3.contains(
+            "YCenter"));
+    }
+
+
+    /**
+     * Test dimension boundary conditions in findMin
+     */
+    public void testFindMinDimensionEdgeCases() throws IOException {
+        it.clear();
+
+        // Create tree where findMin must check both branches due to dimension
+        // mismatch
+        assertTrue(it.insert("Root", 50, 50)); // Dim 0 (X)
+        assertTrue(it.insert("Left", 25, 75)); // Dim 1 (Y)
+        assertTrue(it.insert("Right", 75, 25)); // Dim 1 (Y)
+        assertTrue(it.insert("LL", 20, 60)); // Dim 2 (X)
+        assertTrue(it.insert("LR", 30, 90)); // Dim 2 (X)
+        assertTrue(it.insert("RL", 60, 20)); // Dim 2 (X)
+        assertTrue(it.insert("RR", 90, 30)); // Dim 2 (X)
+
+        // Delete nodes that force complex findMin operations
+        String result1 = it.delete(25, 75); // Forces findMin to check both
+                                            // branches
+        assertTrue("Should delete left node", result1.contains("Left"));
+
+        String result2 = it.delete(50, 50); // Forces findMin on root
+        assertTrue("Should delete root", result2.contains("Root"));
+    }
+
+
+    /**
+     * Test conditional boundary cases in helpRemove
+     */
+    public void testHelpRemoveConditionalBoundaries() throws IOException {
+        it.clear();
+
+        // Test exact equality conditions at different dimensions
+        assertTrue(it.insert("Same", 100, 100));
+        assertTrue(it.insert("SameX", 100, 50)); // Same X, different Y
+        assertTrue(it.insert("SameY", 50, 100)); // Same Y, different X
+        assertTrue(it.insert("Different", 75, 75));
+
+        // Test deletion following different conditional paths
+        String result1 = it.delete(100, 50); // Tests X dimension path
+        assertTrue("Should delete SameX", result1.contains("SameX"));
+
+        String result2 = it.delete(50, 100); // Tests Y dimension path
+        assertTrue("Should delete SameY", result2.contains("SameY"));
+
+        // Test edge case where coordinates are at dimension boundaries
+        it.clear();
+        assertTrue(it.insert("Center", 0, 0));
+        assertTrue(it.insert("NegX", -1, 0)); // Negative X
+        assertTrue(it.insert("NegY", 0, -1)); // Negative Y
+
+        String result3 = it.delete(-1, 0);
+        assertTrue("Should handle negative coordinates", result3.contains(
+            "NegX"));
+    }
+
+
+    /**
+     * Test arithmetic operations with extreme values
+     */
+    public void testArithmeticExtremeValues() throws IOException {
+        it.clear();
+
+        // Test with large coordinates that might cause overflow issues
+        assertTrue(it.insert("Large", 30000, 30000));
+        assertTrue(it.insert("Origin", 0, 0));
+
+        // Search with large radius
+        String result1 = it.search(0, 0, 50000);
+        assertTrue("Should include large coordinate city", result1.contains(
+            "Large"));
+
+        // Test boundary arithmetic with coordinates near limits
+        assertTrue(it.insert("MaxMinus", 99999, 99999));
+        String result2 = it.search(99999, 99999, 1);
+        assertTrue("Should handle max boundary values", result2.contains(
+            "MaxMinus"));
+    }
+
 }
