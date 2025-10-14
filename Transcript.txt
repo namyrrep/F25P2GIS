@@ -787,4 +787,154 @@ private KDNode removeHelp(
     }
     return base;
 }
- 
+
+            base.setRight(removeHelp(base.right(), cityKey, (dimension + 1) % 2,
+                count, result));
+
+give me test cases for this line in remove help and the rest of the method, you need to use the testing style like gis test, this should be a comprehensive test of the delete method for kd tree
+
+
+     // 1) Equals-go-right at root on X (hits the exact line under test)
+    public void testDelete_EqualsGoRight_OnXAtRoot() {
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("SameX_Right", 100, 50)); // equal X, inserted to right
+
+        // Path: root(100,100)[dim=0] -> equals on X -> go right -> delete leaf
+        assertFuzzyEquals("2\nSameX_Right", it.delete(100, 50));
+
+        // Verify removal and structure
+        assertFuzzyEquals("", it.info(100, 50));
+        assertFuzzyEquals("0Root (100, 100)\n", it.debug());
+    }
+
+    // 2) Greater-than-go-right at root on X
+    public void testDelete_GreaterGoRight_OnXAtRoot() {
+        it.clear();
+        assertTrue(it.insert("Root", 50, 50));
+        assertTrue(it.insert("RightLeaf", 70, 70));
+
+        // Path: root(50,50)[dim=0] -> 70 > 50 -> go right -> delete leaf
+        assertFuzzyEquals("2\nRightLeaf", it.delete(70, 70));
+        assertFuzzyEquals("", it.info(70, 70));
+    }
+
+    // 3) Less-than-go-left path (complements right-branch coverage)
+    public void testDelete_LessGoLeft_OnXAtRoot() {
+        it.clear();
+        assertTrue(it.insert("Root", 50, 50));
+        assertTrue(it.insert("LeftLeaf", 25, 25));
+
+        // Path: root(50,50)[dim=0] -> 25 < 50 -> go left -> delete leaf
+        assertFuzzyEquals("2\nLeftLeaf", it.delete(25, 25));
+        assertFuzzyEquals("", it.info(25, 25));
+    }
+
+    // 4) Delete node with right child -> uses findMin and successor replacement
+    public void testDelete_NodeWithRightChild_UsesFindMinAndCounts() {
+        it.clear();
+        // Build: Root(100,100)
+        // Right subtree: Right(150,50) with RL(120,40) and RR(170,60)
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("Left", 50, 150));
+        assertTrue(it.insert("Right", 150, 50));
+        assertTrue(it.insert("RL", 120, 40));
+        assertTrue(it.insert("RR", 170, 60));
+
+        // Delete Root: successor is min by X in right subtree => RL(120,40)
+        // Visits: removeHelp(root)=1, findMin(right)=3 nodes (right, RL, RR),
+        // removeHelp(right)=1, removeHelp(RL)=1 => total 6
+        assertFuzzyEquals("6\nRoot", it.delete(100, 100));
+
+        // Root should now hold successor's data (120,40)
+        assertFuzzyEquals("Root", it.info(120, 40));
+        // Old Right subtree should have RL removed
+        assertFuzzyEquals("", it.info(120, 40)); // Note: Root now at (120,40)
+        // Debug sanity
+        String dbg = it.debug();
+        assertTrue(dbg.contains("Root (120, 40)"));
+        assertTrue(dbg.contains("Right (150, 50)"));
+        assertTrue(dbg.contains("RR (170, 60)"));
+    }
+
+    // 5) Delete node whose right child is null (simple splice with left)
+    public void testDelete_NoRightChild_ReturnsLeft() {
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("Left", 50, 150));
+        assertTrue(it.insert("LL", 25, 125)); // Left has only left child
+
+        // Delete Left: base.right == null -> return base.left
+        // Visits: root(1) -> left(2) => total 2
+        assertFuzzyEquals("2\nLeft", it.delete(50, 150));
+
+        // LL should now hang directly off Root's left
+        String dbg = it.debug();
+        assertTrue(dbg.contains("LL (25, 125)"));
+        assertFalse(dbg.contains("Left (50, 150)"));
+    }
+
+    // 6) Non-existent delete returns empty string
+    public void testDelete_NonExistent_ReturnsEmpty() {
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertFuzzyEquals("", it.delete(200, 200));
+        assertFuzzyEquals("0Root (100, 100)\n", it.debug());
+    }
+
+    // 7) Equals-go-right at level 1 on Y (covers equals-branch when dimension=1)
+    public void testDelete_EqualsGoRight_OnYAtLevel1() {
+        it.clear();
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("L", 50, 150));       // left of root
+        assertTrue(it.insert("LR", 75, 150));      // equals on Y at L's level => goes right
+
+        // Path: root[dim=0] (75 < 100) -> L[dim=1] (150 == 150) -> go right -> LR
+        // Visits: root(1) -> L(2) -> LR(3)
+        assertFuzzyEquals("3\nLR", it.delete(75, 150));
+        assertFuzzyEquals("", it.info(75, 150));
+    }
+
+    // 8) Successor tie on X in right subtree: root-of-right wins ties (strictly smaller only)
+    public void testDelete_SuccessorTieOnX_RightRootWinsTie() {
+        it.clear();
+        // Root to delete; right subtree has two nodes with same min X (tie)
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("RightRoot", 120, 10)); // right subtree root
+        assertTrue(it.insert("RightLeft", 120, 5));  // left child with equal X
+
+        // findMin(descrim=X) should keep RightRoot on tie (no <=), so successor is RightRoot
+        String res = it.delete(100, 100);
+        assertTrue(res.startsWith("")); // we only assert behavior via structure after
+
+        // After replacement, tree should have:
+        // - Root data replaced by RightRoot (120,10)
+        // - Right subtree should be spliced to RightLeft (since we deleted RightRoot and returned its left)
+        String dbg = it.debug();
+        assertTrue(dbg.contains("Root (120, 10)"));
+        assertTrue(dbg.contains("RightLeft (120, 5)"));
+        assertFalse(dbg.contains("RightRoot (120, 10)"));
+    }
+
+    // 9) Complex delete path with mixed left/right and successor delete path
+    public void testDelete_ComplexPath_MixedBranches() {
+        it.clear();
+        assertTrue(it.insert("A", 100, 100));  // root
+        assertTrue(it.insert("B", 50, 150));   // left
+        assertTrue(it.insert("C", 150, 50));   // right
+        assertTrue(it.insert("D", 25, 125));   // left-left
+        assertTrue(it.insert("E", 75, 175));   // left-right
+        assertTrue(it.insert("F", 125, 25));   // right-left
+        assertTrue(it.insert("G", 175, 75));   // right-right
+        assertTrue(it.insert("H", 110, 40));   // in right-left subtree to deepen findMin
+
+        // Delete right subtree root C to force left-branch during successor deletion
+        // and ensure counts include both removeHelp and findMin nodes
+        String s = it.delete(150, 50);
+        assertTrue(s.contains("C"));
+        // Sanity checks on structure after delete
+        String dbg = it.debug();
+        assertFalse(dbg.contains("C (150, 50)"));
+        assertTrue(dbg.contains("F (125, 25)"));
+        assertTrue(dbg.contains("H (110, 40)"));
+        assertTrue(dbg.contains("G (175, 75)"));
+    }

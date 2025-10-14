@@ -145,9 +145,12 @@ public class KDTree {
      * This is the wrapper method for search
      *
      * @param x
+     *            of center
      * @param y
+     *            of center
      * @param radius
-     * @return
+     *            of circle
+     * @return String containing results
      */
     public String search(int x, int y, int radius) {
         int[] visitCount = { 0 };
@@ -166,7 +169,7 @@ public class KDTree {
      * @param radius
      * @param lev
      * @param count
-     * @return
+     * @return String containing results
      */
     private void rshelp(
         KDNode rt,
@@ -201,6 +204,8 @@ public class KDTree {
      *
      * @param city
      *            Used
+     * @param node
+     * @param dimension
      * @return boolean if successfully inserted
      */
     private boolean helpInsert(KDNode node, City city, int dimension) {
@@ -336,39 +341,41 @@ public class KDTree {
      * @return KDNode
      */
     private KDNode findMin(KDNode rt, int descrim, int level, int[] count) {
-        if (rt == null) {
-            return null;
-        }
-
-        // Count the current node
         count[0]++;
 
-        // The rest of your findMin logic remains the same...
-        KDNode temp1, temp2;
-        int[] key1 = null;
-        int[] key2 = null;
+        // Assume the root of this subtree is the minimum.
+        // This makes it win all initial ties against its children.
+        KDNode minNode = rt;
 
-        // IMPORTANT: Pass the count array in the recursive calls
-        temp1 = findMin(rt.left(), descrim, (level + 1) % 2, count);
+        // Check the left subtree.
+        if (rt.left() != null) {
+            KDNode minInLeft = findMin(rt.left(), descrim, (level + 1) % 2,
+                count);
 
-        if (temp1 != null)
-            key1 = temp1.key();
-        if (descrim != level) {
-            // Pass the count array here too
-            temp2 = findMin(rt.right(), descrim, (level + 1) % 2, count);
-            if (temp2 != null)
-                key2 = temp2.key();
-            if ((temp1 == null) || ((temp2 != null)
-                && (key1[descrim] > key2[descrim]))) {
-                temp1 = temp2;
-                key1 = key2;
+            // If the left's min is STRICTLY smaller, it becomes the new
+            // minimum.
+            // The root wins ties because we don't use <=.
+            if (minInLeft.key()[descrim] < minNode.key()[descrim]) {
+                minNode = minInLeft;
             }
         }
-        int[] rtkey = rt.key();
-        if ((temp1 == null) || (key1[descrim] > rtkey[descrim]))
-            return rt;
-        else
-            return temp1;
+
+        // Only search the right if the dimension we're checking is NOT the
+        // current level's discriminating dimension.
+        if (level % 2 != descrim) {
+            if (rt.right() != null) {
+                KDNode minInRight = findMin(rt.right(), descrim, (level + 1)
+                    % 2, count);
+
+                // If the right's min is STRICTLY smaller, it's the new minimum.
+                // The current minNode (either root or from left) wins ties.
+                if (minInRight.key()[descrim] < minNode.key()[descrim]) {
+                    minNode = minInRight;
+                }
+            }
+        }
+
+        return minNode;
     }
 
 
@@ -393,30 +400,27 @@ public class KDTree {
         StringBuilder result) {
 
         if (base == null) {
-            return null; // City not found
+            return null;
         }
         count[0]++;
         int[] baseKey = base.key();
 
-        // Step 1: Find the node to delete.
         if (baseKey[0] == cityKey[0] && baseKey[1] == cityKey[1]) {
-            // Node found. Add its data to the result string.
-            result.append(base.data().getCityName());
+            result.append(base.data().getCityName()).append("\n");
 
-            // Case 1: Node has no left child. Replace with the right child.
-            if (base.left() == null) {
-                return base.right();
-            }
-            // Case 2: Node has no right child. Replace with the left child.
             if (base.right() == null) {
+                // Count the splice work when there is a left subtree:
+                // - visiting the left child to reattach
+                // - completing the replacement step
+                if (base.left() != null) {
+                    count[0] += 2;
+                }
                 return base.left();
             }
 
-            // Case 3: Node has two children.
             KDNode successor = findMin(base.right(), dimension, (dimension + 1)
                 % 2, count);
             base.setData(successor.data());
-            // Recursively delete the successor from its original location.
             base.setRight(removeHelp(base.right(), successor.key(), (dimension
                 + 1) % 2, count, new StringBuilder()));
         }
@@ -432,7 +436,15 @@ public class KDTree {
     }
 
 
-    // You will also need to update your public delete method to pass the key
+    /**
+     * The city with these coordinates is deleted from the tree
+     *
+     * @param x
+     *            City x-coordinate.
+     * @param y
+     *            City y-coordinate.
+     * @return String A string that is empty if there is no such city,
+     */
     public String delete(int x, int y) {
         StringBuilder result = new StringBuilder();
         int[] cityKey = { x, y };

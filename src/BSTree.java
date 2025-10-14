@@ -134,45 +134,79 @@ public class BSTree<T extends Comparable<T>> {
             return null;
         }
 
-        // Rely on the generic type's compareTo method for all comparisons.
         int comparison = base.getData().compareTo(targ);
 
+        // When removing by exact object identity (equals), delete only one
+        // match
+        if (useEquals) {
+            if (comparison > 0) {
+                base.setLeft(removeHelp(base.getLeft(), targ, result, true));
+                return base;
+            }
+            if (comparison < 0) {
+                base.setRight(removeHelp(base.getRight(), targ, result, true));
+                return base;
+            }
+            // comparison == 0: we are in the equal-by-compareTo region; find
+            // exact equals()
+            if (base.getData().equals(targ)) {
+                // Record and delete this single exact node
+                result.append(base.getData().toString()).append("\n");
+                if (base.getLeft() == null) {
+                    return base.getRight();
+                }
+                if (base.getRight() == null) {
+                    return base.getLeft();
+                }
+                // Two children: replace with predecessor and stop (single
+                // deletion)
+                BinaryNode<T> predecessor = getMax(base.getLeft());
+                base.setData(predecessor.getData());
+                base.setLeft(deleteMax(base.getLeft()));
+                return base;
+            }
+        }
+
+        // Removing by compareTo: delete ALL nodes where compareTo == 0
         if (comparison > 0) {
-            base.setLeft(removeHelp(base.getLeft(), targ, result, useEquals));
+            base.setLeft(removeHelp(base.getLeft(), targ, result, false));
             return base;
         }
         if (comparison < 0) {
-            base.setRight(removeHelp(base.getRight(), targ, result, useEquals));
+            base.setRight(removeHelp(base.getRight(), targ, result, false));
             return base;
         }
 
-        // --- Match Found ---
+        // --- Match Found (comparison == 0) ---
         result.append(base.getData().toString()).append("\n");
 
-        // Case 1: No left child. Continue search for duplicates on the right.
+        // Case 1: No left child -> replace by right subtree and continue
+        // removing
         if (base.getLeft() == null) {
-            return removeHelp(base.getRight(), targ, result, useEquals);
-        }
-        // Case 2: No right child.
-        if (base.getRight() == null) {
-            return base.getLeft();
+            return removeHelp(base.getRight(), targ, result, false);
         }
 
-        // Case 3: Two children. Replace with predecessor.
+        // Case 2: No right child -> replace by left subtree and continue
+        // removing
+        if (base.getRight() == null) {
+            return removeHelp(base.getLeft(), targ, result, false);
+        }
+
+        // Case 3: Two children -> replace with predecessor, then continue
+        // removing more
         BinaryNode<T> predecessor = getMax(base.getLeft());
         base.setData(predecessor.getData());
         base.setLeft(deleteMax(base.getLeft()));
-
-        // After replacement, re-run removeHelp on the CURRENT node.
-        // This continues the search for more duplicates from this position.
-        return removeHelp(base, targ, result, useEquals);
+        return removeHelp(base, targ, result, false);
     }
 
 
     private BinaryNode<T> getMax(BinaryNode<T> input) {
-        while (input.getRight() != null)
-            input = input.getRight();
-        return input;
+        if (input.getRight() == null) {
+            return input;
+        }
+        return getMax(input.getRight());
+
     }
 
 
