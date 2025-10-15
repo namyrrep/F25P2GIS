@@ -102,9 +102,9 @@ public class GISDB implements GIS {
 
             String cityInfo = parts[1];
             int parenthesisIndex = cityInfo.indexOf('(');
-            String cityName = (parenthesisIndex == -1) ? cityInfo.trim()
-                    : cityInfo.substring(0, parenthesisIndex).trim();
-
+            String cityName = (parenthesisIndex == -1)
+                ? cityInfo.trim()
+                : cityInfo.substring(0, parenthesisIndex).trim();
 
             City delCity = new City(cityName, x, y);
             // This will now correctly find the city in the bTree

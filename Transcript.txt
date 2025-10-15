@@ -938,3 +938,51 @@ give me test cases for this line in remove help and the rest of the method, you 
         assertTrue(dbg.contains("H (110, 40)"));
         assertTrue(dbg.contains("G (175, 75)"));
     }
+    
+    it.clear();
+
+        // Setup a tree where the root's predecessor is deep in a right chain.
+        // We will delete "M_Root", forcing a deep search for "K_Predecessor".
+        assertTrue(it.insert("M_Root", 100, 100));
+        assertTrue(it.insert("T_RightChild", 150, 150));
+        assertTrue(it.insert("F_SubRoot", 50, 50)); // Root of left subtree
+        assertTrue(it.insert("H_Chain1", 70, 70));
+        assertTrue(it.insert("J_Chain2", 80, 80));
+        assertTrue(it.insert("K_Predecessor", 90, 90)); // Deepest right node
+
+        // Action: Delete the root. This triggers the deep search.
+        String result1 = it.delete("M_Root");
+        assertTrue(result1.contains("M_Root (100, 100)"));
+
+        // Assertions: A mutant would have chosen "F_SubRoot" as the
+        // predecessor. We verify the correct predecessor, "K", took its place.
+        assertEquals("The predecessor should now occupy the old root's spot.",
+            "K_Predecessor", it.info(100, 100));
+        assertEquals("The predecessor's original location should be empty.",
+            "", it.info(90, 90));
+
+
+        // --- SCENARIO 2: Test predecessor with a left child ---
+        it.clear();
+        
+        // Setup a tree where the predecessor ("K_Predecessor") has a left child.
+        assertTrue(it.insert("M_Root", 100, 100));
+        assertTrue(it.insert("T_RightChild", 150, 150));
+        assertTrue(it.insert("F_SubRoot", 50, 50));
+        assertTrue(it.insert("K_Predecessor", 90, 90));
+        assertTrue(it.insert("J_MaxLeftChild", 80, 80)); // Predecessor's left child
+
+        // Action: Delete the root.
+        it.delete("M_Root");
+        
+        // Assertions: We verify the entire tree structure is correct after
+        // the deletion and promotion of the predecessor's left child.
+        // The `print()` method gives an in-order traversal of the BST,
+        // which is perfect for verifying the final structure.
+        String expectedPrint = 
+            "2    J_MaxLeftChild (80, 80)\n" +
+            "1  F_SubRoot (50, 50)\n" +
+            "0K_Predecessor (100, 100)\n" +
+            "1  T_RightChild (150, 150)\n";
+            
+        assertFuzzyEquals(expectedPrint, it.print())

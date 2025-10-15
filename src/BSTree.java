@@ -138,14 +138,6 @@ public class BSTree<T extends Comparable<T>> {
 
         if (useEquals) {
             // --- LOGIC FOR DELETING A SINGLE, EXACT NODE ---
-            if (comparison > 0) {
-                base.setLeft(removeHelp(base.getLeft(), targ, result, true));
-                return base;
-            }
-            if (comparison < 0) {
-                base.setRight(removeHelp(base.getRight(), targ, result, true));
-                return base;
-            }
 
             // We are in the correct region; now find the exact match
             if (base.getData().equals(targ)) {
@@ -154,13 +146,17 @@ public class BSTree<T extends Comparable<T>> {
                 if (base.getLeft() == null) {
                     return base.getRight();
                 }
-                if (base.getRight() == null) {
-                    return base.getLeft();
-                }
+// if (base.getRight() == null) {
+// return base.getLeft();
+// }
                 BinaryNode<T> predecessor = getMax(base.getLeft());
                 base.setData(predecessor.getData());
                 base.setLeft(deleteMax(base.getLeft()));
                 return base; // Deletion is done, stop here.
+            }
+            if (comparison < 0) {
+                base.setRight(removeHelp(base.getRight(), targ, result, true));
+                return base;
             }
 
             // If it's not an exact match, it must be another duplicate,
@@ -175,26 +171,29 @@ public class BSTree<T extends Comparable<T>> {
                 base.setLeft(removeHelp(base.getLeft(), targ, result, false));
                 return base;
             }
-            if (comparison < 0) {
+            else if (comparison < 0) {
                 base.setRight(removeHelp(base.getRight(), targ, result, false));
                 return base;
             }
+            else {
+                // Match Found (comparison == 0)
+                result.append(base.getData().toString()).append("\n");
 
-            // Match Found (comparison == 0)
-            result.append(base.getData().toString()).append("\n");
-
-            if (base.getLeft() == null) {
-                return removeHelp(base.getRight(), targ, result, false);
+                if (base.getLeft() == null) {
+                    return removeHelp(base.getRight(), targ, result, false);
+                }
+                else if (base.getRight() == null) {
+                    return removeHelp(base.getLeft(), targ, result, false);
+                }
+                else {
+                    BinaryNode<T> predecessor = getMax(base.getLeft());
+                    base.setData(predecessor.getData());
+                    base.setLeft(deleteMax(base.getLeft()));
+                    return removeHelp(base, targ, result, false);
+                }
             }
-            if (base.getRight() == null) {
-                return removeHelp(base.getLeft(), targ, result, false);
-            }
-
-            BinaryNode<T> predecessor = getMax(base.getLeft());
-            base.setData(predecessor.getData());
-            base.setLeft(deleteMax(base.getLeft()));
-            return removeHelp(base, targ, result, false);
         }
+
     }
 
 

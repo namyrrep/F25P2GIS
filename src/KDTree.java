@@ -113,12 +113,25 @@ public class KDTree {
     }
 
     private KDNode root;
+    private static final int D = 2; // number of dimensions (2 for x and y)
 
     /**
      * The basic constructor that takes no parameters
      */
     public KDTree() {
         root = null;
+    }
+
+
+    /**
+     * This method returns the current dimension we are on
+     *
+     * @param dimension
+     *            of tree
+     * @return int
+     */
+    private int currDimension(int dimension) {
+        return (dimension + 1) % D;
     }
 
 
@@ -192,10 +205,10 @@ public class KDTree {
 
         // If there is a possible left position.
         if (rtkey[lev] > (point[lev] - radius))
-            rshelp(rt.left(), point, radius, (lev + 1) % 2, count, rs);
+            rshelp(rt.left(), point, radius, currDimension(lev), count, rs);
 
         if (rtkey[lev] <= (point[lev] + radius)) // Changed < to <=
-            rshelp(rt.right(), point, radius, (lev + 1) % 2, count, rs);
+            rshelp(rt.right(), point, radius, currDimension(lev), count, rs);
     }
 
 
@@ -222,7 +235,7 @@ public class KDTree {
                 node.setLeft(new KDNode(city));
                 return true;
             }
-            return helpInsert(node.left(), city, (dimension + 1) % 2);
+            return helpInsert(node.left(), city, currDimension(dimension));
         }
         // If points are the same, return false.
         if (cityKey[0] == nodeKey[0] && cityKey[1] == nodeKey[1])
@@ -232,7 +245,7 @@ public class KDTree {
             node.setRight(new KDNode(city));
             return true;
         }
-        return helpInsert(node.right(), city, (dimension + 1) % 2);
+        return helpInsert(node.right(), city, currDimension(dimension));
     }
 
 
@@ -269,12 +282,12 @@ public class KDTree {
         int[] nodeKey = node.key();
         // If the current dimension for the city is less than node, go left.
         if (key[dimension] < nodeKey[dimension])
-            return helpInfo(node.left(), key, (dimension + 1) % 2);
+            return helpInfo(node.left(), key, currDimension(dimension));
         // Returns if the correct coordinates are found.
         if (key[0] == nodeKey[0] && key[1] == nodeKey[1])
             return node.data().getCityName();
         // If the current dimension for the city is greater than node, go right.
-        return helpInfo(node.right(), key, (dimension + 1) % 2);
+        return helpInfo(node.right(), key, currDimension(dimension));
     }
 
 
@@ -294,7 +307,7 @@ public class KDTree {
 
 
     /**
-     * Returns the tree printed out in pre-order format
+     * Returns the tree printed out in inorder format
      *
      * @param node
      *            of city
@@ -304,31 +317,58 @@ public class KDTree {
      *            added
      * @return String of the tree
      */
-    private String printPreOrder(KDNode node, int dimension, String spaces) {
+    private String printInOrder(KDNode node, int dimension, String spaces) {
         // If node is null, there are no more nodes in branch.
         if (node == null)
             return "";
         String str = "";
-        // left branch
-        str += printPreOrder(node.left(), dimension + 1, spaces + "  ");
-        // current value
-        str += dimension + spaces + node.data().toString() + "\n";
-        // right branch
-        str += printPreOrder(node.right(), dimension + 1, spaces + "  ");
+        // Create indentation string with 2 * dimension spaces
+        StringBuilder indent = new StringBuilder();
+        for (int i = 0; i < 2 * dimension; i++) {
+            indent.append(" ");
+        }
+        // left branch (inorder: left first)
+        str += printInOrder(node.left(), dimension + 1, "");
+        // current value (inorder: root second) - level + spaces + city data
+        str += dimension + indent.toString() + node.data().toString() + "\n";
+        // right branch (inorder: right last)
+        str += printInOrder(node.right(), dimension + 1, "");
         return str;
     }
 
 
     /**
-     * Prints the pre-order helper method
+     * Prints the inorder helper method
      *
      * @return String
      */
     public String debug() {
-        return printPreOrder(root, 0, "");
+        return printInOrder(root, 0, "");
     }
 
 
+    /**
+     * 334
+     * This is the helper method to find the minimum node in a subtree
+     *
+     * 
+     * 336
+     * 
+     * @param rt
+     *            337
+     *            of city
+     *            338
+     * @param descrim
+     *            339
+     *            of tree
+     *            340
+     * @param level
+     *            341
+     *            of tree
+     *            342
+     * @return KDNode
+     *         343
+     */
     /**
      * This is the helper method to find the minimum node in a subtree
      *
@@ -349,7 +389,7 @@ public class KDTree {
 
         // Check the left subtree.
         if (rt.left() != null) {
-            KDNode minInLeft = findMin(rt.left(), descrim, (level + 1) % 2,
+            KDNode minInLeft = findMin(rt.left(), descrim, currDimension(level),
                 count);
 
             // If the left's min is STRICTLY smaller, it becomes the new
@@ -362,10 +402,10 @@ public class KDTree {
 
         // Only search the right if the dimension we're checking is NOT the
         // current level's discriminating dimension.
-        if (level % 2 != descrim) {
+        if (level != descrim) {
             if (rt.right() != null) {
-                KDNode minInRight = findMin(rt.right(), descrim, (level + 1)
-                    % 2, count);
+                KDNode minInRight = findMin(rt.right(), descrim, currDimension(
+                    level), count);
 
                 // If the right's min is STRICTLY smaller, it's the new minimum.
                 // The current minNode (either root or from left) wins ties.
@@ -400,37 +440,58 @@ public class KDTree {
         StringBuilder result) {
 
         if (base == null) {
-            return null;
+            return null; // City not found.
         }
         count[0]++;
         int[] baseKey = base.key();
+        int nextDim = currDimension(dimension);
 
+        // Step 1: Find the node to delete.
         if (baseKey[0] == cityKey[0] && baseKey[1] == cityKey[1]) {
             result.append(base.data().getCityName()).append("\n");
 
-            if (base.right() == null) {
-                // Count the splice work when there is a left subtree:
-                // - visiting the left child to reattach
-                // - completing the replacement step
-                if (base.left() != null) {
-                    count[0] += 2;
-                }
-                return base.left();
+            // Node found. Now handle the deletion cases.
+            if (base.right() != null) {
+                // CASE 1: Node has a right subtree. (Standard case)
+                // Find the minimum node in the right subtree (the successor).
+                KDNode successor = findMin(base.right(), dimension, nextDim,
+                    count);
+                // Replace the current node's data with the successor's.
+                base.setData(successor.data());
+                // Recursively delete the successor from the right subtree.
+                base.setRight(removeHelp(base.right(), successor.key(), nextDim,
+                    count, new StringBuilder()));
             }
-
-            KDNode successor = findMin(base.right(), dimension, (dimension + 1)
-                % 2, count);
-            base.setData(successor.data());
-            base.setRight(removeHelp(base.right(), successor.key(), (dimension
-                + 1) % 2, count, new StringBuilder()));
+            else if (base.left() != null) {
+                // CASE 2: Node has only a left subtree. (Professor's specific
+                // logic)
+                // Find the minimum node in the left subtree.
+                KDNode successor = findMin(base.left(), dimension, nextDim,
+                    count);
+                // Replace the current node's data with the successor's.
+                base.setData(successor.data());
+                // Recursively delete the successor from the left subtree.
+                KDNode modifiedLeftSubtree = removeHelp(base.left(), successor
+                    .key(), nextDim, count, new StringBuilder());
+                // Move the modified left subtree to be the new right subtree.
+                base.setRight(modifiedLeftSubtree);
+                base.setLeft(null); // The left subtree is now empty.
+            }
+            else {
+                // CASE 3: Node is a leaf.
+                return null; // Simply remove it by returning null to the
+                             // parent.
+            }
         }
+        // Step 2: If node not found, continue searching.
         else if (cityKey[dimension] < baseKey[dimension]) {
-            base.setLeft(removeHelp(base.left(), cityKey, (dimension + 1) % 2,
-                count, result));
+            base.setLeft(removeHelp(base.left(), cityKey, nextDim, count,
+                result));
         }
-        else {
-            base.setRight(removeHelp(base.right(), cityKey, (dimension + 1) % 2,
-                count, result));
+        else { // This also handles the case of equal keys on the current
+               // dimension but different on others
+            base.setRight(removeHelp(base.right(), cityKey, nextDim, count,
+                result));
         }
         return base;
     }

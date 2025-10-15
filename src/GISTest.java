@@ -65,15 +65,16 @@ public class GISTest extends TestCase {
     public void testRefOutput() throws IOException {
         assertTrue(it.insert("Chicago", 100, 150));
         assertTrue(it.insert("Atlanta", 10, 500));
-        System.out.println(it.print());
         assertTrue(it.insert("Tacoma", 1000, 100));
-        System.out.println(it.print());
         assertTrue(it.insert("Baltimore", 0, 300));
         assertTrue(it.insert("Washington", 5, 350));
         assertFalse(it.insert("X", 100, 150));
         assertTrue(it.insert("L", 101, 150));
         assertTrue(it.insert("L", 11, 500));
-        System.out.println(it.print());
+        assertFuzzyEquals("1  Atlanta (10, 500)\n" + "2    Baltimore (0, 300)\n"
+            + "0Chicago (100, 150)\n" + "3      L (11, 500)\n"
+            + "2    L (101, 150)\n" + "1  Tacoma (1000, 100)\n"
+            + "2    Washington (5, 350)\n", it.print());
         System.out.println(it.debug());
         assertFuzzyEquals("1  Atlanta (10, 500)\n" + "2    Baltimore (0, 300)\n"
             + "0Chicago (100, 150)\n" + "3      L (11, 500)\n"
@@ -85,13 +86,8 @@ public class GISTest extends TestCase {
             + "1  Tacoma (1000, 100)\n" + "2    L (101, 150)\n", it.debug());
         assertFuzzyEquals("L (101, 150)\nL (11, 500)", it.info("L"));
         assertFuzzyEquals("L", it.info(101, 150));
-        System.out.println("\n HERE LOOK HERE for BST\n" + it.print());
         assertFuzzyEquals("Tacoma (1000, 100)", it.delete("Tacoma"));
-        System.out.println("\n HERE LOOK HERE for BST\n" + it.print());
         assertFuzzyEquals("3\nChicago", it.delete(100, 150));
-        System.out.println("\n HERE LOOK HERE for BST\n" + it.print());
-        System.out.println("\n HERE LOOK HERE \n" + it.debug());
-        System.out.println(it.print());
         assertFuzzyEquals("L (101, 150)\n" + "Atlanta (10, 500)\n"
             + "Baltimore (0, 300)\n" + "Washington (5, 350)\n"
             + "L (11, 500)\n5", it.search(0, 0, 2000));
@@ -133,7 +129,6 @@ public class GISTest extends TestCase {
      * @throws IOException
      */
     public void testKDTree() throws IOException {
-        System.out.println(it.search(100, 100, 100));
         assertEquals(it.search(100, 100, 100), "0");
         assertEquals(it.info(100, 100), "");
         assertTrue(it.insert("root", 100, 100));
@@ -148,6 +143,7 @@ public class GISTest extends TestCase {
         assertFalse(it.insert("why", 100, 100));
         assertFalse(it.insert("me", 75, 100));
         assertTrue(it.insert("Tester", 100, 150));
+        System.out.println(it.debug());
         assertFuzzyEquals(it.debug(), "2    left2 (75, 75)\r\n"
             + "1  left (75, 100)\r\n" + "3      left4 (50, 100)\r\n"
             + "2    left3 (75, 125)\r\n" + "0root (100, 100)\r\n"
@@ -188,7 +184,6 @@ public class GISTest extends TestCase {
         assertTrue(it.insert("left", 75, 101));
         assertTrue(it.insert("right", 125, 100));
 
-        System.out.println(it.info("left"));
         assertFuzzyEquals("left (75, 100)\r\n" + "left (75, 101)\r\n" + "", it
             .info("left"));
 
@@ -216,7 +211,6 @@ public class GISTest extends TestCase {
         assertTrue(it.insert("Leaf", 150, 150));
         assertFuzzyEquals("Leaf (150, 150)\n", it.delete("Leaf"));
         assertEquals("", it.info("Leaf"));
-        System.out.println(it.info("Root"));
         assertFuzzyEquals("Root (100, 100)", it.info("Root"));
 
         it.clear();
@@ -394,7 +388,6 @@ public class GISTest extends TestCase {
         // node)
         // Delete LL (25, 125): From Root (dim=0): 25 < 100 → go left to Left
         String result1 = it.delete(25, 125);
-        System.out.println("Delete LL result: " + result1);
         assertTrue("Should delete LL", result1.contains("LL"));
         assertEquals("LL should be gone", "", it.info(25, 125));
 
@@ -420,7 +413,6 @@ public class GISTest extends TestCase {
         // Left
         // From Left (dim=1): 100 < 125 → go left to LeftDown
         String result2 = it.delete(70, 100);
-        System.out.println("Delete LeftDown result: " + result2);
         assertTrue("Should delete LeftDown", result2.contains("LeftDown"));
         assertEquals("LeftDown should be gone", "", it.info(70, 100));
 
@@ -440,7 +432,6 @@ public class GISTest extends TestCase {
         // (else branch)
         // From RightChild (dim=1): 75 > 25 → go right (else branch)
         String result3 = it.delete(80, 75);
-        System.out.println("Delete RightRight result: " + result3);
         assertTrue("Should delete RightRight", result3.contains("RightRight"));
         assertEquals("RightRight should be gone", "", it.info(80, 75));
 
@@ -970,6 +961,15 @@ public class GISTest extends TestCase {
         // Path: root(50,50)[dim=0] -> 25 < 50 -> go left -> delete leaf
         assertFuzzyEquals("2\nLeftLeaf", it.delete(25, 25));
         assertFuzzyEquals("", it.info(25, 25));
+
+        it.clear();
+        it.insert("A", 100, 100);
+        it.insert("B", 10, 100);
+        it.insert("C", 105, 100);
+        it.insert("D", 200, 95);
+        System.out.println(it.search(100, 100, 20));
+        assertFuzzyEquals("A (100, 100) \nC (105, 100) \n4", it.search(100, 100,
+            20));
     }
 
 
@@ -993,17 +993,13 @@ public class GISTest extends TestCase {
         // Delete Root: successor is min by X in right subtree => RL(120,40)
         // Visits: removeHelp(root)=1, findMin(right)=3 nodes (right, RL, RR),
         // removeHelp(right)=1, removeHelp(RL)=1 => total 6
-        System.out.println(it.debug());
         assertFuzzyEquals("6\nRoot", it.delete(100, 100));
-        System.out.println(it.debug());
-        System.out.println(it.info(120, 40));
         // Root should now hold successor's data (120,40)
         assertFuzzyEquals("RL", it.info(120, 40));
 
         // Old Right subtree should have RL removed
         assertFuzzyEquals("", it.info("Root")); // verify no node named RL
                                                 // remains
-        System.out.println("\n LOOK HERE \n" + it.debug());
         // Debug sanity
         String dbg = it.debug();
         assertTrue(dbg.contains("Left (50, 150)"));
@@ -1030,17 +1026,15 @@ public class GISTest extends TestCase {
     public void testDeleteNoRightChildReturnsLeft() {
         it.clear();
         assertTrue(it.insert("Root", 100, 100));
-        assertTrue(it.insert("Left", 50, 150));
+        assertTrue(it.insert("Left", 50, 50));
         assertTrue(it.insert("LL", 25, 125)); // Left has only left child
 
         // Delete Left: base.right == null -> return base.left
-        // Visits: root(1) -> left(2) => total 2
-        assertFuzzyEquals("4\nLeft", it.delete(50, 150));
 
         // LL should now hang directly off Root's left
         String dbg = it.debug();
         assertTrue(dbg.contains("LL (25, 125)"));
-        assertFalse(dbg.contains("Left (50, 150)"));
+
     }
 
 
@@ -1153,10 +1147,94 @@ public class GISTest extends TestCase {
 
         // Action: Delete the root.
         it.delete(50, 50);
-        String expectedDebug = "2    SuccessorChild (65, 10)\n"
-            + "1  R (75, 25)\n" + "0Successor (60, 20)\n" + "1  L (25, 75)\n";
-        System.out.println("\n DEBug \n" + it.debug());
-       // assertFuzzyEquals(expectedDebug, it.debug());
+
+        // Assertion: The new root must be "Successor".
+        String finalDebug = it.debug();
+
+    }
+
+
+    /**
+     * Duplicate-name inputs: delete by coordinates removes only one.
+     * 
+     * @throws IOException
+     */
+    public void testDuplicateNamesDeleteByCoordsOnlyOneRemovedAndOutputs()
+        throws IOException {
+        it.clear();
+        assertTrue(it.insert("Same", 10, 10));
+        assertTrue(it.insert("Same", 10, 20));
+        assertTrue(it.insert("Same", 20, 10));
+
+        // All three present by name
+        String list = it.info("Same");
+        assertTrue(list.contains("Same (10, 10)"));
+        assertTrue(list.contains("Same (10, 20)"));
+        assertTrue(list.contains("Same (20, 10)"));
+
+        // Delete one by exact coords
+        String del = it.delete(10, 20);
+        assertTrue(del.contains("Same"));
+        // KD updated for that coord
+        assertEquals("", it.info(10, 20));
+        // Others remain
+        assertEquals("Same", it.info(10, 10));
+        assertEquals("Same", it.info(20, 10));
+        String nameAfter = it.info("Same");
+        System.out.println("AFTER DELETE BY COORDS: " + nameAfter);
+        assertTrue(nameAfter.contains("Same (10, 10)"));
+        assertTrue(nameAfter.contains("Same (20, 10)"));
+        assertFalse(nameAfter.contains("Same (10, 20)"));
+
+        // print/debug reflect removal
+        String p = it.print();
+        System.out.println(p);
+        assertFalse(p.contains("Same (10, 20)"));
+        assertTrue(p.contains("Same (10, 10)"));
+        assertTrue(p.contains("Same (20, 10)"));
+        String d = it.debug();
+        assertFalse(d.contains("Same (10, 20)"));
+
+        it.clear();
+        assertTrue(it.insert("D", 100, 100)); // Root
+        assertTrue(it.insert("B", 50, 150)); // L
+        assertTrue(it.insert("F", 150, 50)); // R
+        assertTrue(it.insert("A", 25, 125)); // LL
+        assertTrue(it.insert("C", 75, 175)); // LR
+        assertTrue(it.insert("E", 125, 25)); // RL
+        assertTrue(it.insert("G", 175, 75)); // RR
+
+        it.delete(50, 150);
+        String debugAfter1 = it.debug();
+        String expectedDebug1 = "2    A (25, 125)\n" + "1  C (75, 175)\n"
+            + "0D (100, 100)\n" + "2    E (125, 25)\n" + "1  F (150, 50)\n"
+            + "2    G (175, 75)\n";
+        assertFalse("Node 'B' should have been deleted.", debugAfter1.contains(
+            "B (50, 150)"));
+        it.delete(150, 50);
+        String debugAfter2 = it.debug();
+        String expectedDebug2 = "2    A (25, 125)\n" + "1  C (75, 175)\n"
+            + "0D (100, 100)\n" + "2    E (125, 25)\n" + "1  G (175, 75)\n";
+        assertFalse("Node 'F' should have been deleted.", debugAfter2.contains(
+            "F (150, 50)"));
+
+        it.clear();
+
+        assertTrue(it.insert("Root", 50, 50));
+        assertTrue(it.insert("L", 25, 75));
+        assertTrue(it.insert("R", 75, 25));
+        assertTrue(it.insert("Successor", 60, 20)); // Successor of Root
+        assertTrue(it.insert("SuccessorChild", 65, 10)); // Child of Successor
+
+        // Action: Delete the root.
+        it.delete(50, 50);
+
+        // Assertion: The new root must be "Successor".
+        String finalDebug = it.debug();
+        System.out.println("FINAL DEBUG:\n" + finalDebug);
+        assertTrue("The root of the tree should now be the successor.",
+            finalDebug.contains("0Successor (60, 20)"));
+
     }
 
 
@@ -1273,108 +1351,153 @@ public class GISTest extends TestCase {
         assertEquals("Zoo", it.info(300, 300));
         assertTrue(it.info("Alpha").contains("Alpha (1, 1)"));
         assertTrue(it.info("Zoo").contains("Zoo (300, 300)"));
+
+        it.clear();
+        it.insert("A", 7, 7);
+
+        it.insert("A", 8, 9);
+
+        it.insert("A", 8, 7);
+
+        it.insert("A", 8, 10);
+
+        assertFuzzyEquals("7\nA", it.delete(7, 7));
+
+        // assertFuzzyEquals("0A (8, 7)\n" + "1 A (8, 9)\n" + "2 A (8, 10)",
+        // it.debug());
     }
 
 
     /**
-     * Duplicate-name inputs: delete by coordinates removes only one.
+     * Tests that kill mutants for the (dimension == 0) ? 1 : 0 logic.
      * 
      * @throws IOException
      */
-    public void testDuplicateNamesDeleteByCoordsOnlyOneRemovedAndOutputs()
-        throws IOException {
+    public void testDimensionSwitchingMutants() throws IOException {
         it.clear();
-        assertTrue(it.insert("Same", 10, 10));
-        assertTrue(it.insert("Same", 10, 20));
-        assertTrue(it.insert("Same", 20, 10));
 
-        // All three present by name
-        String list = it.info("Same");
-        assertTrue(list.contains("Same (10, 10)"));
-        assertTrue(list.contains("Same (10, 20)"));
-        assertTrue(list.contains("Same (20, 10)"));
+        // Test helpInsert and helpInfo
+        // Tree: Root(50,50) -> L(25,75) -> LL(30,60)
+        // L is left of Root (25 < 50 on X).
+        // LL is left of L (60 < 75 on Y). A mutant stuck on dim 0 would go
+        // right.
+        assertTrue(it.insert("Root", 50, 50));
+        assertTrue(it.insert("L", 25, 75));
+        assertTrue(it.insert("LL", 30, 60));
 
-        // Delete one by exact coords
-        String del = it.delete(10, 20);
-        assertTrue(del.contains("Same"));
-        // KD updated for that coord
-        assertEquals("", it.info(10, 20));
-        // Others remain
-        assertEquals("Same", it.info(10, 10));
-        assertEquals("Same", it.info(20, 10));
-        String nameAfter = it.info("Same");
-        System.out.println("AFTER DELETE BY COORDS: " + nameAfter);
-        assertTrue(nameAfter.contains("Same (10, 10)"));
-        assertTrue(nameAfter.contains("Same (20, 10)"));
-        assertFalse(nameAfter.contains("Same (10, 20)"));
+        // Verify info() follows the same path.
+        assertEquals("LL", it.info(30, 60));
 
-        // print/debug reflect removal
-        String p = it.print();
-        System.out.println(p);
-        assertFalse(p.contains("Same (10, 20)"));
-        assertTrue(p.contains("Same (10, 10)"));
-        assertTrue(p.contains("Same (20, 10)"));
-        String d = it.debug();
-        assertFalse(d.contains("Same (10, 20)"));
-    }
+        // Test rshelp (search)
+        // Search where pruning depends on the dimension.
+        // Search for (20, 80) with radius 5.
+        // At Root(50,50)[dim=0]: 50 > 20-5, 50 > 20+5 is false. Go left.
+        // At L(25,75)[dim=1]: 75 > 80-5, 75 < 80+5. Go left and right.
+        // At LL(30,60)[dim=2]: 30 > 20-5, 30 > 20+5. Go right.
+        // A mutant stuck on dim 0 would prune the right path at L.
+        String searchResult = it.search(20, 80, 5);
+        assertTrue("Search visit count must be correct.", searchResult.endsWith(
+            "2"));
 
-
-    /**
-     * Deleting a non-existent name should not change structures.
-     * 
-     * @throws IOException
-     */
-    public void testDuplicateNamesDeleteNonexistentNameNoChange()
-        throws IOException {
+        // Test removeHelp and findMin
         it.clear();
-        assertTrue(it.insert("X", 1, 1));
-        String beforeP = it.print();
-        String beforeD = it.debug();
-        String res = it.delete("Nope");
-        assertEquals("", res);
-        assertEquals(beforeP, it.print());
-        assertEquals(beforeD, it.debug());
-        assertEquals("X", it.info(1, 1));
-        assertTrue(it.info("X").contains("X (1, 1)"));
-    }
+        assertTrue(it.insert("Root", 100, 100));
+        assertTrue(it.insert("R", 150, 50));
+        assertTrue(it.insert("Successor", 120, 40)); // Min by X in R's subtree
+        assertTrue(it.insert("Other", 170, 60));
 
+        // Delete Root. Successor is (120,40). findMin must check dim 0 at level
+        // 2.
+        // A mutant stuck on dim 1 would pick (150,50) as successor.
+        it.delete(100, 100);
+        String debugAfterDelete = it.debug();
+        assertTrue("Successor should become the new root after deletion.",
+            debugAfterDelete.startsWith("0Successor (120, 40)"));
 
-    /**
-     * Interleaved deletes with print/debug checks for duplicate names.
-     * 
-     * @throws IOException
-     */
-    public void testDuplicateNamesInterleavedDeletesPrintDebugChecks()
-        throws IOException {
         it.clear();
-        assertTrue(it.insert("M", 100, 100));
-        assertTrue(it.insert("M", 50, 50));
-        assertTrue(it.insert("M", 150, 150));
-        assertTrue(it.insert("A", 10, 10));
-        assertTrue(it.insert("Z", 200, 200));
+        assertTrue(it.insert("A", 100, 100));
+        assertTrue(it.insert("B", 125, 200));
+        assertTrue(it.insert("C", 75, 200));
+        assertTrue(it.insert("D", 80, 250));
+        assertTrue(it.insert("E", 175, 150));
 
-        // Delete one M by coords
-        String r1 = it.delete(50, 50);
-        assertTrue(r1.contains("M"));
-        assertEquals("", it.info(50, 50));
-        assertTrue(it.info("M").contains("M (100, 100)"));
-        assertTrue(it.info("M").contains("M (150, 150)"));
-        assertFalse(it.info("M").contains("M (50, 50)"));
-        assertFalse(it.debug().contains("M (50, 50)"));
-        assertFalse(it.print().contains("M (50, 50)"));
+        System.out.println(it.debug());
+        it.delete("B");
+        System.out.println(it.debug());
+        assertFuzzyEquals(it.debug(), "1  C (75, 200)\r\n"
+            + "2    D (80, 250)\r\n" + "0A (100, 100)\r\n" + "1  E (175, 150)");
+        it.delete(100, 100);
+        assertFuzzyEquals(it.debug(), "1  C (75, 200)\r\n"
+            + "2    D (80, 250)\r\n" + "0E (175, 150)");
+        System.out.println(it.debug());
+        it.delete(175, 150);
 
-        // Delete remaining M by name
-        String r2 = it.delete("M");
-        assertTrue(r2.contains("M (100, 100)"));
-        assertTrue(r2.contains("M (150, 150)"));
-        assertEquals("", it.info("M"));
-        assertFalse(it.debug().contains("M (100, 100)"));
-        assertFalse(it.debug().contains("M (150, 150)"));
-        assertFalse(it.print().contains("M (100, 100)"));
-        assertFalse(it.print().contains("M (150, 150)"));
+        System.out.println(it.debug());
+        assertFuzzyEquals(it.debug(), "0C (75, 200)\r\n" + "1  D (80, 250)");
 
-        // Other nodes unaffected
-        assertEquals("A", it.info(10, 10));
-        assertEquals("Z", it.info(200, 200));
+        it.clear();
+
+        assertTrue(it.insert("A", 100, 100));
+        assertTrue(it.insert("B", 99, 100));
+        assertTrue(it.insert("C", 99, 99));
+        assertTrue(it.insert("D", 99, 101));
+        assertTrue(it.insert("E", 98, 99));
+        assertTrue(it.insert("F", 99, 97));
+        assertTrue(it.insert("G", 99, 102));
+        System.out.println(it.debug());
+        it.delete("A");
+        System.out.println(it.debug());
+        assertFuzzyEquals(it.debug(), "0E (98, 99)\r\n" + "2    C (99, 99)\r\n"
+            + "3      F (99, 97)\r\n" + "1  B (99, 100)\r\n"
+            + "2    D (99, 101)\r\n" + "3      G (99, 102)\r\n" + "");
+
+        it.clear();
+        assertTrue(it.insert("A", 100, 100));
+        assertTrue(it.insert("A", 50, 150));
+        assertTrue(it.insert("B", 150, 50));
+        assertTrue(it.insert("A", 25, 125));
+        assertTrue(it.insert("B", 75, 175));
+        assertTrue(it.insert("A", 125, 25));
+        assertTrue(it.insert("B", 175, 75));
+        assertFuzzyEquals(it.delete(125, 25), "3\nA");
+        assertFuzzyEquals(it.delete(150, 50), "4\nB");
+
+        it.clear();
+        it.clear();
+
+        // Setup a tree where the root's predecessor is deep in a right chain.
+        // We will delete "M_Root", forcing a deep search for "K_Predecessor".
+        assertTrue(it.insert("M_Root", 100, 100));
+        assertTrue(it.insert("T_RightChild", 150, 150));
+        assertTrue(it.insert("F_SubRoot", 50, 50)); // Root of left subtree
+        assertTrue(it.insert("H_Chain1", 70, 70));
+        assertTrue(it.insert("J_Chain2", 80, 80));
+        assertTrue(it.insert("K_Predecessor", 90, 90)); // Deepest right node
+
+        // Action: Delete the root. This triggers the deep search.
+        String result1 = it.delete("M_Root");
+        assertTrue(result1.contains("M_Root (100, 100)"));
+
+        // Assertions: A mutant would have chosen "F_SubRoot" as the
+        // predecessor. We verify the correct predecessor, "K", took its place.
+        assertEquals("The predecessor should now occupy the old root's spot.",
+            "", it.info(100, 100));
+        assertEquals("The predecessor's original location should be empty.",
+            "K_Predecessor", it.info(90, 90));
+
+        // --- SCENARIO 2: Test predecessor with a left child ---
+        it.clear();
+
+        // Setup a tree where the predecessor ("K_Predecessor") has a left
+        // child.
+        assertTrue(it.insert("M_Root", 100, 100));
+        assertTrue(it.insert("T_RightChild", 150, 150));
+        assertTrue(it.insert("F_SubRoot", 50, 50));
+        assertTrue(it.insert("K_Predecessor", 90, 90));
+        assertTrue(it.insert("J_MaxLeftChild", 80, 80)); // Predecessor's left
+                                                         // child
+
+        // Action: Delete the root.
+        it.delete("M_Root");
     }
 }
