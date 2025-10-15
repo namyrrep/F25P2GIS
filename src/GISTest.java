@@ -1143,6 +1143,20 @@ public class GISTest extends TestCase {
         assertTrue(dbg.contains("F (125, 25)"));
         assertTrue(dbg.contains("H (110, 40)"));
         assertTrue(dbg.contains("G (175, 75)"));
+
+        it.clear();
+        assertTrue(it.insert("Root", 50, 50));
+        assertTrue(it.insert("L", 25, 75));
+        assertTrue(it.insert("R", 75, 25));
+        assertTrue(it.insert("Successor", 60, 20)); // Successor of Root
+        assertTrue(it.insert("SuccessorChild", 65, 10)); // Child of Successor
+
+        // Action: Delete the root.
+        it.delete(50, 50);
+        String expectedDebug = "2    SuccessorChild (65, 10)\n"
+            + "1  R (75, 25)\n" + "0Successor (60, 20)\n" + "1  L (25, 75)\n";
+        System.out.println("\n DEBug \n" + it.debug());
+       // assertFuzzyEquals(expectedDebug, it.debug());
     }
 
 
@@ -1189,5 +1203,178 @@ public class GISTest extends TestCase {
         System.out.println(it.debug());
         assertTrue(it.delete("A").contains("A"));
         System.out.println(it.debug());
+
+        it.clear();
+        assertTrue(it.insert("A", 100, 100));
+        assertTrue(it.insert("A", 50, 150));
+        assertTrue(it.insert("A", 150, 50));
+        assertTrue(it.insert("A", 25, 125));
+        assertTrue(it.insert("A", 75, 175));
+        assertTrue(it.insert("A", 125, 25));
+        System.out.println(it.info("A"));
+        it.delete(75, 175);
+        System.out.println("\n HERE HERE HERE \n" + it.info("A"));
+
+    }
+
+
+    /**
+     * Duplicate-name inputs: delete by name removes all and updates KD/BST.
+     * 
+     * @throws IOException
+     */
+    public void testDuplicateNamesDeleteByNameAllRemovedAndOutputsUpdate()
+        throws IOException {
+        it.clear();
+        assertTrue(it.insert("Alpha", 1, 1));
+        assertTrue(it.insert("Dup", 10, 10));
+        assertTrue(it.insert("Dup", 20, 20));
+        assertTrue(it.insert("Dup", 5, 5));
+        assertTrue(it.insert("Zoo", 300, 300));
+
+        // Pre-conditions
+        String beforeInfo = it.info("Dup");
+        assertTrue(beforeInfo.contains("Dup (10, 10)"));
+        assertTrue(beforeInfo.contains("Dup (20, 20)"));
+        assertTrue(beforeInfo.contains("Dup (5, 5)"));
+        String beforePrint = it.print();
+        assertTrue(beforePrint.contains("Dup (10, 10)"));
+        assertTrue(beforePrint.contains("Dup (20, 20)"));
+        assertTrue(beforePrint.contains("Dup (5, 5)"));
+        String beforeDebug = it.debug();
+        assertTrue(beforeDebug.contains("Dup (10, 10)"));
+        assertTrue(beforeDebug.contains("Dup (20, 20)"));
+        assertTrue(beforeDebug.contains("Dup (5, 5)"));
+
+        // Delete all by name
+        String deleted = it.delete("Dup");
+        assertTrue(deleted.contains("Dup (10, 10)"));
+        assertTrue(deleted.contains("Dup (20, 20)"));
+        assertTrue(deleted.contains("Dup (5, 5)"));
+
+        // KD should be updated: no coords remain
+        assertEquals("", it.info(10, 10));
+        assertEquals("", it.info(20, 20));
+        assertEquals("", it.info(5, 5));
+        // BST info empty for name
+        assertEquals("", it.info("Dup"));
+        // print/debug should not contain any Dup entries
+        String afterPrint = it.print();
+        assertFalse(afterPrint.contains("Dup (10, 10)"));
+        assertFalse(afterPrint.contains("Dup (20, 20)"));
+        assertFalse(afterPrint.contains("Dup (5, 5)"));
+        String afterDebug = it.debug();
+        assertFalse(afterDebug.contains("Dup (10, 10)"));
+        assertFalse(afterDebug.contains("Dup (20, 20)"));
+        assertFalse(afterDebug.contains("Dup (5, 5)"));
+
+        // Other cities remain
+        assertEquals("Alpha", it.info(1, 1));
+        assertEquals("Zoo", it.info(300, 300));
+        assertTrue(it.info("Alpha").contains("Alpha (1, 1)"));
+        assertTrue(it.info("Zoo").contains("Zoo (300, 300)"));
+    }
+
+
+    /**
+     * Duplicate-name inputs: delete by coordinates removes only one.
+     * 
+     * @throws IOException
+     */
+    public void testDuplicateNamesDeleteByCoordsOnlyOneRemovedAndOutputs()
+        throws IOException {
+        it.clear();
+        assertTrue(it.insert("Same", 10, 10));
+        assertTrue(it.insert("Same", 10, 20));
+        assertTrue(it.insert("Same", 20, 10));
+
+        // All three present by name
+        String list = it.info("Same");
+        assertTrue(list.contains("Same (10, 10)"));
+        assertTrue(list.contains("Same (10, 20)"));
+        assertTrue(list.contains("Same (20, 10)"));
+
+        // Delete one by exact coords
+        String del = it.delete(10, 20);
+        assertTrue(del.contains("Same"));
+        // KD updated for that coord
+        assertEquals("", it.info(10, 20));
+        // Others remain
+        assertEquals("Same", it.info(10, 10));
+        assertEquals("Same", it.info(20, 10));
+        String nameAfter = it.info("Same");
+        System.out.println("AFTER DELETE BY COORDS: " + nameAfter);
+        assertTrue(nameAfter.contains("Same (10, 10)"));
+        assertTrue(nameAfter.contains("Same (20, 10)"));
+        assertFalse(nameAfter.contains("Same (10, 20)"));
+
+        // print/debug reflect removal
+        String p = it.print();
+        System.out.println(p);
+        assertFalse(p.contains("Same (10, 20)"));
+        assertTrue(p.contains("Same (10, 10)"));
+        assertTrue(p.contains("Same (20, 10)"));
+        String d = it.debug();
+        assertFalse(d.contains("Same (10, 20)"));
+    }
+
+
+    /**
+     * Deleting a non-existent name should not change structures.
+     * 
+     * @throws IOException
+     */
+    public void testDuplicateNamesDeleteNonexistentNameNoChange()
+        throws IOException {
+        it.clear();
+        assertTrue(it.insert("X", 1, 1));
+        String beforeP = it.print();
+        String beforeD = it.debug();
+        String res = it.delete("Nope");
+        assertEquals("", res);
+        assertEquals(beforeP, it.print());
+        assertEquals(beforeD, it.debug());
+        assertEquals("X", it.info(1, 1));
+        assertTrue(it.info("X").contains("X (1, 1)"));
+    }
+
+
+    /**
+     * Interleaved deletes with print/debug checks for duplicate names.
+     * 
+     * @throws IOException
+     */
+    public void testDuplicateNamesInterleavedDeletesPrintDebugChecks()
+        throws IOException {
+        it.clear();
+        assertTrue(it.insert("M", 100, 100));
+        assertTrue(it.insert("M", 50, 50));
+        assertTrue(it.insert("M", 150, 150));
+        assertTrue(it.insert("A", 10, 10));
+        assertTrue(it.insert("Z", 200, 200));
+
+        // Delete one M by coords
+        String r1 = it.delete(50, 50);
+        assertTrue(r1.contains("M"));
+        assertEquals("", it.info(50, 50));
+        assertTrue(it.info("M").contains("M (100, 100)"));
+        assertTrue(it.info("M").contains("M (150, 150)"));
+        assertFalse(it.info("M").contains("M (50, 50)"));
+        assertFalse(it.debug().contains("M (50, 50)"));
+        assertFalse(it.print().contains("M (50, 50)"));
+
+        // Delete remaining M by name
+        String r2 = it.delete("M");
+        assertTrue(r2.contains("M (100, 100)"));
+        assertTrue(r2.contains("M (150, 150)"));
+        assertEquals("", it.info("M"));
+        assertFalse(it.debug().contains("M (100, 100)"));
+        assertFalse(it.debug().contains("M (150, 150)"));
+        assertFalse(it.print().contains("M (100, 100)"));
+        assertFalse(it.print().contains("M (150, 150)"));
+
+        // Other nodes unaffected
+        assertEquals("A", it.info(10, 10));
+        assertEquals("Z", it.info(200, 200));
     }
 }

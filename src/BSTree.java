@@ -136,9 +136,8 @@ public class BSTree<T extends Comparable<T>> {
 
         int comparison = base.getData().compareTo(targ);
 
-        // When removing by exact object identity (equals), delete only one
-        // match
         if (useEquals) {
+            // --- LOGIC FOR DELETING A SINGLE, EXACT NODE ---
             if (comparison > 0) {
                 base.setLeft(removeHelp(base.getLeft(), targ, result, true));
                 return base;
@@ -147,10 +146,10 @@ public class BSTree<T extends Comparable<T>> {
                 base.setRight(removeHelp(base.getRight(), targ, result, true));
                 return base;
             }
-            // comparison == 0: we are in the equal-by-compareTo region; find
-            // exact equals()
+
+            // We are in the correct region; now find the exact match
             if (base.getData().equals(targ)) {
-                // Record and delete this single exact node
+                // Found the one to delete
                 result.append(base.getData().toString()).append("\n");
                 if (base.getLeft() == null) {
                     return base.getRight();
@@ -158,46 +157,44 @@ public class BSTree<T extends Comparable<T>> {
                 if (base.getRight() == null) {
                     return base.getLeft();
                 }
-                // Two children: replace with predecessor and stop (single
-                // deletion)
                 BinaryNode<T> predecessor = getMax(base.getLeft());
                 base.setData(predecessor.getData());
                 base.setLeft(deleteMax(base.getLeft()));
+                return base; // Deletion is done, stop here.
+            }
+
+            // If it's not an exact match, it must be another duplicate,
+            // so we must continue searching ONLY on the left as per project
+            // rules.
+            base.setLeft(removeHelp(base.getLeft(), targ, result, true));
+            return base;
+        }
+        else {
+            // --- LOGIC FOR DELETING ALL DUPLICATES BY NAME ---
+            if (comparison > 0) {
+                base.setLeft(removeHelp(base.getLeft(), targ, result, false));
                 return base;
             }
-        }
+            if (comparison < 0) {
+                base.setRight(removeHelp(base.getRight(), targ, result, false));
+                return base;
+            }
 
-        // Removing by compareTo: delete ALL nodes where compareTo == 0
-        if (comparison > 0) {
-            base.setLeft(removeHelp(base.getLeft(), targ, result, false));
-            return base;
-        }
-        if (comparison < 0) {
-            base.setRight(removeHelp(base.getRight(), targ, result, false));
-            return base;
-        }
+            // Match Found (comparison == 0)
+            result.append(base.getData().toString()).append("\n");
 
-        // --- Match Found (comparison == 0) ---
-        result.append(base.getData().toString()).append("\n");
+            if (base.getLeft() == null) {
+                return removeHelp(base.getRight(), targ, result, false);
+            }
+            if (base.getRight() == null) {
+                return removeHelp(base.getLeft(), targ, result, false);
+            }
 
-        // Case 1: No left child -> replace by right subtree and continue
-        // removing
-        if (base.getLeft() == null) {
-            return removeHelp(base.getRight(), targ, result, false);
+            BinaryNode<T> predecessor = getMax(base.getLeft());
+            base.setData(predecessor.getData());
+            base.setLeft(deleteMax(base.getLeft()));
+            return removeHelp(base, targ, result, false);
         }
-
-        // Case 2: No right child -> replace by left subtree and continue
-        // removing
-        if (base.getRight() == null) {
-            return removeHelp(base.getLeft(), targ, result, false);
-        }
-
-        // Case 3: Two children -> replace with predecessor, then continue
-        // removing more
-        BinaryNode<T> predecessor = getMax(base.getLeft());
-        base.setData(predecessor.getData());
-        base.setLeft(deleteMax(base.getLeft()));
-        return removeHelp(base, targ, result, false);
     }
 
 
